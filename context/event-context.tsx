@@ -10,37 +10,17 @@ import {
   getEventBySlug as getFirestoreEventBySlug,
 } from "@/lib/firebase-service"
 import { useAuth } from "@/components/auth-provider"
-
-// Define the event type
-export interface Event {
-  id: string
-  slug: string
-  title: string
-  description: string
-  date: string
-  time: string
-  location: string
-  venue: string
-  address: string
-  city?: string
-  imageUrl: string
-  price: number
-  category: string
-  ticketsAvailable: number
-  organizer: string
-  organizerDescription?: string
-}
-
+import { EventProps } from "@/types/event"
 // Create the context
 interface EventContextType {
-  events: Event[]
+  events: EventProps[]
   loading: boolean
   error: string | null
-  addEvent: (event: Omit<Event, "id" | "slug">) => Promise<Event | null>
-  updateEvent: (id: string, event: Partial<Event>) => Promise<Event | null>
+  addEvent: (event: Omit<EventProps, "id" | "slug">) => Promise<EventProps | null>
+  updateEvent: (id: string, event: Partial<EventProps>) => Promise<EventProps | null>
   deleteEvent: (id: string) => Promise<boolean>
-  getEventById: (id: string) => Promise<Event | null>
-  getEventBySlug: (slug: string) => Promise<Event | null>
+  getEventById: (id: string) => Promise<EventProps | null>
+  getEventBySlug: (slug: string) => Promise<EventProps | null>
   refreshEvents: () => Promise<void>
 }
 
@@ -48,7 +28,7 @@ const EventContext = createContext<EventContextType | undefined>(undefined)
 
 // Create a provider component
 export function EventProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useState<Event[]>([])
+  const [events, setEvents] = useState<EventProps[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
@@ -99,7 +79,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
   }
 
   // Add a new event
-  const addEvent = async (event: Omit<Event, "id" | "slug">) => {
+  const addEvent = async (event: Omit<EventProps, "id" | "slug">) => {
     try {
       if (!user) {
         throw new Error("You must be logged in to add an event")
@@ -111,13 +91,45 @@ export function EventProvider({ children }: { children: ReactNode }) {
       const newEvent = await createFirestoreEvent({
         ...event,
         slug,
-        userId: user.uid, // Use the actual user ID from auth context
+        userId: user.uid,
+        bubbles: false,
+        cancelBubble: false,
+        cancelable: false,
+        composed: false,
+        currentTarget: null,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        returnValue: false,
+        srcElement: null,
+        target: null,
+        timeStamp: 0,
+        type: "",
+        composedPath: function (): EventTarget[] {
+          throw new Error("Function not implemented.")
+        },
+        initEvent: function (type: string, bubbles?: boolean, cancelable?: boolean): void {
+          throw new Error("Function not implemented.")
+        },
+        preventDefault: function (): void {
+          throw new Error("Function not implemented.")
+        },
+        stopImmediatePropagation: function (): void {
+          throw new Error("Function not implemented.")
+        },
+        stopPropagation: function (): void {
+          throw new Error("Function not implemented.")
+        },
+        NONE: 0,
+        CAPTURING_PHASE: 1,
+        AT_TARGET: 2,
+        BUBBLING_PHASE: 3
       })
 
       if (newEvent) {
         // Add to local state
-        setEvents((prev) => [...prev, newEvent as Event])
-        return newEvent as Event
+        setEvents((prev) => [...prev, newEvent as unknown as EventProps])
+        return newEvent as unknown as EventProps
       }
       return null
     } catch (err) {
@@ -128,10 +140,10 @@ export function EventProvider({ children }: { children: ReactNode }) {
   }
 
   // Update an existing event
-  const updateEvent = async (id: string, updatedEvent: Partial<Event>) => {
+  const updateEvent = async (id: string, updatedEvent: Partial<EventProps>) => {
     try {
       // If title is being updated, also update the slug
-      const updateData: Partial<Event> = { ...updatedEvent }
+      const updateData: Partial<EventProps> = { ...updatedEvent }
       if (updatedEvent.title) {
         updateData.slug = createSlug(updatedEvent.title)
       }
@@ -177,7 +189,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
       // If not found locally, fetch from Firestore
       const event = await getFirestoreEventById(id)
-      return event as Event | null
+      return event as EventProps | null
     } catch (err) {
       console.error("Error getting event by ID:", err)
       setError("Failed to get event")
@@ -194,7 +206,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
       // If not found locally, fetch from Firestore
       const event = await getFirestoreEventBySlug(slug)
-      if (event) return event as Event
+      if (event) return event as EventProps
 
       // If still not found, refresh events and try again
       await refreshEvents()

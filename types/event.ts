@@ -71,3 +71,22 @@ export interface TicketProps {
   purchaseDate: Timestamp
   status: "confirmed" | "cancelled" | "used"
 }
+// Define the event type
+export interface EventProps {
+  id: string
+  slug: string
+  title: string
+  description: string
+  date: string
+  time: string
+  location: string
+  venue: string
+  address: string
+  city?: string
+  imageUrl: string
+  price: number
+  category: string
+  ticketsAvailable: number
+  organizer: string
+  organizerDescription?: string
+}

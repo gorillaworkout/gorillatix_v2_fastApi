@@ -15,7 +15,7 @@ import {
   runTransaction,
 } from "firebase/firestore"
 import { db, auth } from "./firebase"
-import type { Event } from "@/context/event-context"
+import { EventProps } from "@/types/event"
 
 // Types
 export interface FirestoreEvent extends Omit<Event, "id"> {
@@ -23,6 +23,7 @@ export interface FirestoreEvent extends Omit<Event, "id"> {
   createdAt?: Timestamp
   updatedAt?: Timestamp
   userId: string
+  slug: string
 }
 
 export interface Ticket {
@@ -70,7 +71,7 @@ export async function getEvents() {
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as Event[]
+    })) as EventProps[]
   } catch (error) {
     console.error("Error getting events:", error)
     throw error
@@ -83,7 +84,7 @@ export async function getEventById(id: string) {
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Event
+      return { id: docSnap.id, ...docSnap.data() } as EventProps
     } else {
       return null
     }
@@ -100,7 +101,7 @@ export async function getEventBySlug(slug: string) {
 
     if (!querySnapshot.empty) {
       const doc = querySnapshot.docs[0]
-      return { id: doc.id, ...doc.data() } as Event
+      return { id: doc.id, ...doc.data() } as EventProps
     } else {
       return null
     }
@@ -156,7 +157,7 @@ export async function getEventsByCategory(category: string) {
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as Event[]
+    })) as EventProps[]
   } catch (error) {
     console.error("Error getting events by category:", error)
     throw error
@@ -170,7 +171,7 @@ export async function searchEvents(searchTerm: string) {
     const events = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as Event[]
+    })) as EventProps[]
 
     // Filter events client-side
     const searchTermLower = searchTerm.toLowerCase()

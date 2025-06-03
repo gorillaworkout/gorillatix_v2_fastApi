@@ -14,27 +14,28 @@ import {
   serverTimestamp,
 } from "firebase/firestore"
 import { db } from "./firebase"
+import { EventProps } from "@/types/event"
 
 // Event types
-export interface Event {
-  id: string
-  slug: string
-  title: string
-  description: string
-  date: string
-  time: string
-  location: string
-  venue: string
-  address: string
-  imageUrl: string
-  price: number
-  category: string
-  ticketsAvailable: number
-  organizer: string
-  organizerDescription: string
-  createdAt: Timestamp
-  updatedAt: Timestamp
-}
+// export interface Event {
+//   id: string
+//   slug: string
+//   title: string
+//   description: string
+//   date: string
+//   time: string
+//   location: string
+//   venue: string
+//   address: string
+//   imageUrl: string
+//   price: number
+//   category: string
+//   ticketsAvailable: number
+//   organizer: string
+//   organizerDescription: string
+//   createdAt: Timestamp
+//   updatedAt: Timestamp
+// }
 
 export interface EventInput {
   slug: string
@@ -61,7 +62,7 @@ export async function getEvents() {
   return eventsSnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
-  })) as Event[]
+  })) as EventProps[]
 }
 
 // Get event by slug
@@ -78,7 +79,7 @@ export async function getEventBySlug(slug: string) {
   return {
     id: doc.id,
     ...doc.data(),
-  } as Event
+  } as unknown as Event
 }
 
 // Get event by ID
@@ -93,7 +94,7 @@ export async function getEventById(id: string) {
   return {
     id: eventSnapshot.id,
     ...eventSnapshot.data(),
-  } as Event
+  } as unknown as Event
 }
 
 // Create a new event
@@ -139,7 +140,7 @@ export async function getEventsByCategory(category: string) {
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
-  })) as Event[]
+  })) as EventProps[]
 }
 
 // Search events
@@ -158,7 +159,7 @@ export async function searchEvents(searchTerm: string) {
         ({
           id: doc.id,
           ...doc.data(),
-        }) as Event,
+        }) as unknown as EventProps,
     )
     .filter(
       (event) =>
@@ -180,7 +181,7 @@ export async function getUpcomingEvents(limitCount = 10) {
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
-  })) as Event[]
+  })) as EventProps[]
 }
 
 // Order types

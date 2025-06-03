@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, SetStateAction } from "react"
 import { useSearchParams } from "next/navigation"
 import { EventCard } from "@/components/event-card"
 import { SearchForm } from "@/components/search-form"
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { useEvents } from "@/context/event-context"
 import { Button } from "@/components/ui/button"
+import { EventProps } from "@/types/event"
 
 function EventsLoading() {
   return (
@@ -29,8 +30,8 @@ export default function EventsPage() {
   const queryParam = searchParams.get("query")
 
   const { events } = useEvents()
-  const [filteredEvents, setFilteredEvents] = useState([])
-  const [displayedEvents, setDisplayedEvents] = useState([])
+  const [filteredEvents, setFilteredEvents] = useState<EventProps[]>([])
+  const [displayedEvents, setDisplayedEvents] = useState<EventProps[]>([])
   const [category, setCategory] = useState(categoryParam || "all")
   const [searchQuery, setSearchQuery] = useState(queryParam || "")
   const [isLoading, setIsLoading] = useState(true)
@@ -80,12 +81,12 @@ export default function EventsPage() {
     filterEvents()
   }, [filterEvents])
 
-  const handleSearch = (query) => {
+  const handleSearch = (query: SetStateAction<string>) => {
     setIsLoading(true)
     setSearchQuery(query)
   }
 
-  const handleCategoryChange = (value) => {
+  const handleCategoryChange = (value: SetStateAction<string>) => {
     setIsLoading(true)
     setCategory(value)
   }
@@ -143,10 +144,10 @@ export default function EventsPage() {
 
       {isLoading ? (
         <EventsLoading />
-      ) : displayedEvents.length > 0 ? (
+      ) : displayedEvents && displayedEvents?.length > 0 ? (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {displayedEvents.map((event) => (
+            {displayedEvents && displayedEvents?.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
