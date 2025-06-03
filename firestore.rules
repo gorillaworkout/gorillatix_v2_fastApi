@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read and update their own profiles
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Events collection
+    match /events/{eventId} {
+      // Anyone can read events
+      allow read: if true;
+      // Only authenticated users can create events
+      allow create: if isAuthenticated();
+      // Only the event creator or admin can update/delete events
+      allow update, delete: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+    }
+    
+    // Tickets collection
+    match /tickets/{ticketId} {
+      // Users can read their own tickets, admins can read all
+      allow read: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      // Only authenticated users can create tickets
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+      // Only ticket owner or admin can update tickets
+      allow update: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      // Only admins can delete tickets
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Users can read their own orders, admins can read all
+      allow read: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      // Only authenticated users can create orders
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+      // Only order owner or admin can update orders
+      allow update: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || isAdmin());
+      // Only admins can delete orders
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+  }
+}
