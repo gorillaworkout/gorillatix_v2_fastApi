@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getRecentSales } from "@/lib/admin-service"
 import { Loader2 } from "lucide-react"
+import { formatRupiah } from "@/lib/utils"
 
 export function AdminRecentSales() {
   const [sales, setSales] = useState<any[]>([])
@@ -55,7 +56,7 @@ export function AdminRecentSales() {
               {sale.eventName} - {sale.quantity} {sale.quantity === 1 ? "ticket" : "tickets"}
             </p>
           </div>
-          <div className="ml-auto font-medium">+${sale.totalPrice.toFixed(2)}</div>
+          <div className="ml-auto font-medium">{formatRupiah(sale.totalPrice)}</div>
         </div>
       ))}
     </div>

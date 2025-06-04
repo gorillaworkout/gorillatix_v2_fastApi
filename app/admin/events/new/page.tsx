@@ -72,6 +72,7 @@ export default function NewEventPage() {
         imageUrl: "/placeholder.svg?height=400&width=800",
         price: Number.parseFloat(values.price),
         ticketsAvailable: Number.parseInt(values.totalTickets),
+        ticketsSold: 0,
         organizer: "Your Organization", // This would come from the user's profile in a real app
         organizerDescription: "Event organizer description",
       })
@@ -266,11 +267,11 @@ export default function NewEventPage() {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ticket Price ($)</FormLabel>
+                    <FormLabel>Ticket Price (RP)</FormLabel>
                     <FormControl>
                       <Input type="number" min="0" step="0.01" {...field} />
                     </FormControl>
-                    <FormDescription>The price per ticket in USD.</FormDescription>
+                    <FormDescription>The price per ticket in Rupiah.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

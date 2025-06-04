@@ -11,11 +11,11 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { formatDate, formatRupiah } from "@/lib/utils"
 import { useEvents } from "@/context/event-context"
-
+import { EventProps } from "@/types/event"
 export default function EventPage() {
   const params = useParams()
   const { events, getEventBySlug } = useEvents()
-  const [event, setEvent] = useState(null)
+  const [event, setEvent] = useState<EventProps | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

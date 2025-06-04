@@ -13,6 +13,7 @@ import { AdminEventsList } from "@/components/admin/events-list"
 import { getTotalRevenue, getTicketsSold, getActiveEventsCount, getUsersCount } from "@/lib/admin-service"
 import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
+import { formatRupiah } from "@/lib/utils"
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -97,7 +98,7 @@ export default function AdminDashboardPage() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.revenue.total.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{formatRupiah(stats.revenue.total)}</div>
                 <p className="text-xs text-muted-foreground">
                   {stats.revenue.percentChange >= 0 ? "+" : ""}
                   {stats.revenue.percentChange.toFixed(1)}% from last month

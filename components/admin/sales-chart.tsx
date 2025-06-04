@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "@/components/ui/chart"
 import { getMonthlySalesData } from "@/lib/admin-service"
 import { Loader2 } from "lucide-react"
+import { formatRupiah } from "@/lib/utils"
 
 export function AdminSalesChart() {
   const [data, setData] = useState<any[]>([])
@@ -60,7 +61,8 @@ export function AdminSalesChart() {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[0.70rem] uppercase text-muted-foreground">Revenue</span>
-                      <span className="font-bold">${payload[0].value}</span>
+                      {}
+                      <span className="font-bold"> {formatRupiah(payload[0].value as number)}</span>
                     </div>
                   </div>
                 </div>

@@ -87,6 +87,7 @@ export interface EventProps {
   price: number
   category: string
   ticketsAvailable: number
+  ticketsSold: number
   organizer: string
   organizerDescription?: string
 }

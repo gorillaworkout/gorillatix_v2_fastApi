@@ -227,10 +227,12 @@ export async function purchaseTicket(eventId: string, quantity: number, price: n
 
       // Update the event's available tickets
       const newTicketsAvailable = Math.max(0, eventData.ticketsAvailable - quantity)
-
+      let ticketSold = `${Number(eventData.ticketsSold) + quantity}`
+      console.log(ticketSold, 'ticket sold', Number(eventData.ticketsSold),'=>', quantity);
       transaction.update(eventRef, {
         ticketsAvailable: newTicketsAvailable,
         updatedAt: serverTimestamp(),
+        ticketsSold: `${ticketSold}`,
       })
 
       // Add the ticket

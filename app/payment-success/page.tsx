@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { getTicketById } from "@/lib/firebase-service"
 import { useAuth } from "@/components/auth-provider"
+import { formatRupiah } from "@/lib/utils"
 
 export default function PaymentSuccessPage() {
   const [loading, setLoading] = useState(true)
@@ -102,7 +103,7 @@ export default function PaymentSuccessPage() {
             </div>
             <div>
               <h3 className="font-medium">Total Price</h3>
-              <p>${ticket.totalPrice.toFixed(2)}</p>
+              <p>{formatRupiah(ticket.totalPrice)}</p>
             </div>
             <div>
               <h3 className="font-medium">Ticket ID</h3>

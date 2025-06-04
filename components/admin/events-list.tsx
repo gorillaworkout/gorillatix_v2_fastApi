@@ -32,7 +32,7 @@ export function AdminEventsList() {
   const { events, deleteEvent } = useEvents()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
-
+  console.log(events, 'events');
   const handleDelete = (id: string) => {
     setSelectedEventId(id)
     setDeleteDialogOpen(true)
@@ -79,7 +79,7 @@ export function AdminEventsList() {
                   {event.ticketsAvailable > 0 ? "Active" : "Sold Out"}
                 </Badge>
               </TableCell>
-              <TableCell>{0}</TableCell>
+              <TableCell>{event.ticketsSold}</TableCell>
               <TableCell>{event.ticketsAvailable}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>

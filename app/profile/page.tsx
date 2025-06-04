@@ -20,6 +20,7 @@ import { TicketViewer } from "@/components/ticket-viewer";
 import { useAuth } from "@/components/auth-provider";
 import { TicketViewerProps } from "@/types/tickets";
 import { getEventById, getUserTickets } from "@/lib/firebase-service";
+import { formatRupiah } from "@/lib/utils";
 
 // Mock data for tickets
 // const mockTickets = [
@@ -172,6 +173,7 @@ export default function ProfilePage() {
     const eventDate = new Date(event.date);
     return eventDate < today;
   });
+  console.log(upcomingTickets, 'upcoming tickets');
   if (loading) {
     return (
       <div className="container flex h-screen items-center justify-center">
@@ -313,11 +315,12 @@ export default function ProfilePage() {
                               <div className="flex items-center text-sm text-muted-foreground">
                                 <Calendar className="mr-1 h-4 w-4" />
                                 {new Date(ticket.date).toLocaleDateString()}
+                                
                               </div>
                               <div className="text-sm text-muted-foreground mt-1">
                                 {ticket.quantity}{" "}
                                 {ticket.quantity === 1 ? "ticket" : "tickets"} •
-                                ${ticket.totalPrice.toFixed(2)}
+                                {formatRupiah(ticket.totalPrice)}
                               </div>
                             </div>
                             <div className="flex gap-2">
