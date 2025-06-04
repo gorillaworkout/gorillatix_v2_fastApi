@@ -112,47 +112,157 @@ export default function CheckoutPage() {
   const fees = subtotal * 0.05 // 5% service fee
   const total = subtotal + fees
 
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   if (!event || !user) return
+
+  //   setIsLoading(true)
+  //   setError(null)
+
+  //   try {
+  //     // Create form data for server action
+  //     const formData = new FormData()
+  //     formData.append("eventId", event.id)
+  //     formData.append("quantity", values.quantity)
+  //     formData.append("price", event.price.toString())
+  //     formData.append("userId", user.uid)
+
+  //     console.log("Submitting purchase with userId:", user.uid)
+
+  //     // Process the purchase using server action
+  //     const result = await processTicketPurchase(formData)
+
+  //     if (result.success) {
+  //       toast({
+  //         title: "Payment successful",
+  //         description: "Your tickets have been sent to your email.",
+  //       })
+
+  //       router.push(`/payment-success?ticketId=${result.ticketId}`)
+  //     } else {
+  //       setError(result.message || "Payment failed. Please try again.")
+  //     }
+  //   } catch (error) {
+  //     console.error("Checkout error:", error)
+  //     setError(error instanceof Error ? error.message : "An error occurred while processing your purchase")
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Payment failed",
+  //       description: "Please try again later.",
+  //     })
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!event || !user) return
+  if (!event || !user) return;
 
-    setIsLoading(true)
-    setError(null)
+  setIsLoading(true);
+  setError(null);
 
-    try {
-      // Create form data for server action
-      const formData = new FormData()
-      formData.append("eventId", event.id)
-      formData.append("quantity", values.quantity)
-      formData.append("price", event.price.toString())
-      formData.append("userId", user.uid)
+  try {
+    // Prepare transaction data for Midtrans
+    const transactionPayload = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phone: values.phone,
+      quantity: parseInt(values.quantity),
+      price: total, // assumed number
+    };
 
-      console.log("Submitting purchase with userId:", user.uid)
+    const response = await fetch("/api/transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(transactionPayload),
+    });
 
-      // Process the purchase using server action
-      const result = await processTicketPurchase(formData)
+    if (!response.ok) throw new Error("Failed to create transaction");
+    const data: { token: string } = await response.json();
 
-      if (result.success) {
+    const snap = (window as any).snap as {
+      pay: (
+        token: string,
+        callbacks?: {
+          onSuccess?: (result: any) => void;
+          onPending?: (result: any) => void;
+          onError?: (result: any) => void;
+          onClose?: () => void;
+        }
+      ) => void;
+    };
+
+    snap?.pay(data.token, {
+      onSuccess: async () => {
+        // ✅ Submit ticket to Firestore after payment success
+        const formData = new FormData();
+        formData.append("eventId", event.id);
+        formData.append("quantity", values.quantity);
+        formData.append("price", event.price.toString());
+        formData.append("userId", user.uid);
+
+        try {
+          const result = await processTicketPurchase(formData);
+
+          if (result.success) {
+            toast({
+              title: "Payment successful",
+              description: "Your tickets have been sent to your email.",
+            });
+
+            router.push(`/payment-success?ticketId=${result.ticketId}`);
+          } else {
+            setError(result.message || "Failed to save ticket after payment.");
+            toast({
+              variant: "destructive",
+              title: "Ticket Processing Failed",
+              description: "Your payment succeeded but ticket creation failed.",
+            });
+          }
+        } catch (error) {
+          console.error("Ticket process error:", error);
+          setError("Something went wrong saving your ticket.");
+          toast({
+            variant: "destructive",
+            title: "Ticket Save Error",
+            description: "Please contact support.",
+          });
+        }
+      },
+
+      onPending: () => {
         toast({
-          title: "Payment successful",
-          description: "Your tickets have been sent to your email.",
-        })
+          title: "Awaiting payment",
+          description: "Please complete the transaction.",
+        });
+      },
 
-        router.push(`/payment-success?ticketId=${result.ticketId}`)
-      } else {
-        setError(result.message || "Payment failed. Please try again.")
-      }
-    } catch (error) {
-      console.error("Checkout error:", error)
-      setError(error instanceof Error ? error.message : "An error occurred while processing your purchase")
-      toast({
-        variant: "destructive",
-        title: "Payment failed",
-        description: "Please try again later.",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+      onError: () => {
+        toast({
+          variant: "destructive",
+          title: "Payment failed",
+          description: "Please try again later.",
+        });
+      },
+
+      onClose: () => {
+        toast({
+          title: "Payment cancelled",
+          description: "You closed the payment popup.",
+        });
+      },
+    });
+  } catch (error) {
+    console.error("Midtrans error:", error);
+    toast({
+      variant: "destructive",
+      title: "Payment failed",
+      description: "An unexpected error occurred. Please try again.",
+    });
+  } finally {
+    setIsLoading(false);
   }
+}
+
 
   if (authLoading || isLoadingEvent) {
     return (
