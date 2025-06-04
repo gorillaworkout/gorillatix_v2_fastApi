@@ -83,7 +83,7 @@ export default function LoginPage() {
                 src="/images/gorillatix-logo.png"
                 alt="GorillaTix Logo"
                 fill
-                sizes="96px"
+                // sizes="96px"
                 priority
                 className="object-contain"
               />
