@@ -353,15 +353,3 @@ export async function updateOrderStatus(id: string, status: "pending" | "complet
 
   return id
 }
-
-
-// upload image to storage firebase
-
-const storage = getStorage() // pastikan Firebase sudah diinisialisasi
-
-async function uploadImage(file: File) {
-  const storageRef = ref(storage, `event-images/${Date.now()}-${file.name}`)
-  const snapshot = await uploadBytes(storageRef, file)
-  const downloadURL = await getDownloadURL(snapshot.ref)
-  return downloadURL
-}

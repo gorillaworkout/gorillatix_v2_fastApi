@@ -251,6 +251,18 @@ export default function ProfilePage() {
                       </a>
                     </Button>
                   )}
+                  {user?.role === "admin" && (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      asChild
+                    >
+                      <a href="/admin/scan">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Scan Ticket
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -315,7 +327,7 @@ export default function ProfilePage() {
                               <div className="flex items-center text-sm text-muted-foreground">
                                 <Calendar className="mr-1 h-4 w-4" />
                                 {new Date(ticket.date).toLocaleDateString()}
-                                
+
                               </div>
                               <div className="text-sm text-muted-foreground mt-1">
                                 {ticket.quantity}{" "}
@@ -372,7 +384,7 @@ export default function ProfilePage() {
                                 </h3>
                                 <div className="flex items-center text-sm text-muted-foreground">
                                   <Calendar className="mr-1 h-4 w-4" />
-                                   {event.date} at {event.time}
+                                  {event.date} at {event.time}
                                 </div>
                                 <div className="text-sm text-muted-foreground mt-1">
                                   {ticket.quantity}{" "}

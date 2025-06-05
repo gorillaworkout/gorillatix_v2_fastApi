@@ -110,48 +110,7 @@ export default function CheckoutPage() {
   const subtotal = event && event.price ? event.price * quantity : 0
   const fees = subtotal * 0.05 // 5% service fee
   const total = subtotal + fees
-
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   if (!event || !user) return
-
-  //   setIsLoading(true)
-  //   setError(null)
-
-  //   try {
-  //     // Create form data for server action
-  //     const formData = new FormData()
-  //     formData.append("eventId", event.id)
-  //     formData.append("quantity", values.quantity)
-  //     formData.append("price", event.price.toString())
-  //     formData.append("userId", user.uid)
-
-  //     console.log("Submitting purchase with userId:", user.uid)
-
-  //     // Process the purchase using server action
-  //     const result = await processTicketPurchase(formData)
-
-  //     if (result.success) {
-  //       toast({
-  //         title: "Payment successful",
-  //         description: "Your tickets have been sent to your email.",
-  //       })
-
-  //       router.push(`/payment-success?ticketId=${result.ticketId}`)
-  //     } else {
-  //       setError(result.message || "Payment failed. Please try again.")
-  //     }
-  //   } catch (error) {
-  //     console.error("Checkout error:", error)
-  //     setError(error instanceof Error ? error.message : "An error occurred while processing your purchase")
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Payment failed",
-  //       description: "Please try again later.",
-  //     })
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
   if (!event || !user) return;
 
