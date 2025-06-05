@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { useEvents } from "@/context/event-context"
 import { Button } from "@/components/ui/button"
-import { EventProps } from "@/types/event"
+import { EventItem } from "@/types/event"
 
 function EventsLoading() {
   return (
@@ -30,8 +30,8 @@ export default function EventsPage() {
   const queryParam = searchParams.get("query")
 
   const { events } = useEvents()
-  const [filteredEvents, setFilteredEvents] = useState<EventProps[]>([])
-  const [displayedEvents, setDisplayedEvents] = useState<EventProps[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<EventItem[]>([])
+  const [displayedEvents, setDisplayedEvents] = useState<EventItem[]>([])
   const [category, setCategory] = useState(categoryParam || "all")
   const [searchQuery, setSearchQuery] = useState(queryParam || "")
   const [isLoading, setIsLoading] = useState(true)

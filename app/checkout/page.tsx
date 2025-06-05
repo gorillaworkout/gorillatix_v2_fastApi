@@ -27,7 +27,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   quantity: z.string().min(1, { message: "Please select quantity" }),
-  paymentMethod: z.string().min(1, { message: "Please select a payment method" }),
+  // paymentMethod: z.string().min(1, { message: "Please select a payment method" }),
 })
 
 export default function CheckoutPage() {
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
 
               <Separator />
 
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Payment Method</h2>
                 <FormField
                   control={form.control}
@@ -418,7 +418,7 @@ export default function CheckoutPage() {
                     </FormItem>
                   )}
                 />
-              </div>
+              </div> */}
 
               <div className="pt-4">
                 <Button type="submit" className="w-full" size="lg" disabled={isLoading}>

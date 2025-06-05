@@ -15,13 +15,15 @@ import {
   runTransaction,
 } from "firebase/firestore"
 import { db, auth } from "./firebase"
-import { EventProps } from "@/types/event"
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
+
+import { EventItem, Order, OrderInput } from "@/types/event"
 
 // Types
-export interface FirestoreEvent extends Omit<Event, "id"> {
+export interface FirestoreEvent extends Omit<EventItem, "id"> {
   id?: string
-  createdAt?: Timestamp
-  updatedAt?: Timestamp
+  createdAt: Timestamp
+  updatedAt: Timestamp
   userId: string
   slug: string
 }
@@ -71,7 +73,7 @@ export async function getEvents() {
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as EventProps[]
+    })) as EventItem[]
   } catch (error) {
     console.error("Error getting events:", error)
     throw error
@@ -84,7 +86,7 @@ export async function getEventById(id: string) {
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as EventProps
+      return { id: docSnap.id, ...docSnap.data() } as EventItem
     } else {
       return null
     }
@@ -101,7 +103,7 @@ export async function getEventBySlug(slug: string) {
 
     if (!querySnapshot.empty) {
       const doc = querySnapshot.docs[0]
-      return { id: doc.id, ...doc.data() } as EventProps
+      return { id: doc.id, ...doc.data() } as EventItem
     } else {
       return null
     }
@@ -157,7 +159,7 @@ export async function getEventsByCategory(category: string) {
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as EventProps[]
+    })) as EventItem[]
   } catch (error) {
     console.error("Error getting events by category:", error)
     throw error
@@ -171,7 +173,7 @@ export async function searchEvents(searchTerm: string) {
     const events = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as EventProps[]
+    })) as EventItem[]
 
     // Filter events client-side
     const searchTermLower = searchTerm.toLowerCase()
@@ -294,4 +296,72 @@ export async function updateTicketStatus(id: string, status: "confirmed" | "canc
     console.error("Error updating ticket status:", error)
     throw error
   }
+}
+
+// Get upcoming events
+export async function getUpcomingEvents(limitCount = 10) {
+  const eventsCollection = collection(db, "events")
+  const today = new Date().toISOString().split("T")[0] // Format: YYYY-MM-DD
+
+  const q = query(eventsCollection, where("date", ">=", today), orderBy("date", "asc"), limit(limitCount))
+
+  const querySnapshot = await getDocs(q)
+
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as EventItem[]
+}
+
+// Create a new order
+export async function createOrder(orderData: OrderInput) {
+  const ordersCollection = collection(db, "orders")
+
+  const newOrder = {
+    ...orderData,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }
+
+  const docRef = await addDoc(ordersCollection, newOrder)
+  return docRef.id
+}
+
+
+
+// Get orders by user ID
+export async function getOrdersByUserId(userId: string) {
+  const ordersCollection = collection(db, "orders")
+  const q = query(ordersCollection, where("userId", "==", userId), orderBy("createdAt", "desc"))
+
+  const querySnapshot = await getDocs(q)
+
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Order[]
+}
+
+// Update order status
+export async function updateOrderStatus(id: string, status: "pending" | "completed" | "cancelled") {
+  const orderDoc = doc(db, "orders", id)
+
+  await updateDoc(orderDoc, {
+    status,
+    updatedAt: serverTimestamp(),
+  })
+
+  return id
+}
+
+
+// upload image to storage firebase
+
+const storage = getStorage() // pastikan Firebase sudah diinisialisasi
+
+async function uploadImage(file: File) {
+  const storageRef = ref(storage, `event-images/${Date.now()}-${file.name}`)
+  const snapshot = await uploadBytes(storageRef, file)
+  const downloadURL = await getDownloadURL(snapshot.ref)
+  return downloadURL
 }
