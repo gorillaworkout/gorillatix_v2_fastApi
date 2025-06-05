@@ -51,7 +51,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { ClientProviders } from "@/components/client-providers" // ✅ new wrapper
 
 const inter = Inter({ subsets: ["latin"] })
-const midtransClientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
+const midtransClientKey = process.env.MIDTRANS_CLIENT_KEY
 
 export const metadata: Metadata = {
   title: "GorillaTix - Online Ticketing Platform",
