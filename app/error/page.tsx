@@ -1,27 +1,30 @@
-// pages/error.tsx
-import { useRouter } from "next/router"
-import Head from "next/head"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+
 
 export default function PaymentErrorPage() {
-  const router = useRouter()
 
   return (
     <>
-      <Head>
-        <title>Payment Error | GorillaTix</title>
-      </Head>
-      <main className="min-h-screen flex flex-col justify-center items-center bg-red-50">
-        <h1 className="text-3xl font-bold text-red-600 mb-4">❌ Payment Failed</h1>
-        <p className="text-gray-700 mb-6">
-          An error occurred during the payment process. Please try again or contact support if the issue persists.
-        </p>
-        <button
-          onClick={() => router.push("/events")}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Back to Events
-        </button>
-      </main>
+         <div className="container flex h-screen max-w-screen-md items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Authentication Error</CardTitle>
+          <CardDescription>There was a problem with authentication</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4">
+            Authentication is currently disabled in this preview environment. Please continue as a guest.
+          </p>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button asChild className="w-full">
+            <Link href="/">Return to Home</Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
     </>
   )
 }
