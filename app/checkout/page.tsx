@@ -103,7 +103,6 @@ export default function CheckoutPage() {
       email: user?.email || "",
       phone: "",
       quantity: "1",
-      paymentMethod: "",
     },
   })
 
