@@ -89,7 +89,19 @@ const config: Config = {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		}
-  	}
+  	},
+	 container: {
+      center: true,
+      padding: "1rem",
+      screens: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1800px", // ← custom max-width
+        "3xl": "1920px"  // ← custom class if needed
+      },
+    },
   },
   plugins: [require("tailwindcss-animate")],
 };
