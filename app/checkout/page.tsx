@@ -136,7 +136,6 @@ export default function CheckoutPage() {
 
     if (!response.ok) throw new Error("Failed to create transaction");
     const data: { token: string } = await response.json();
-    console.log(response, 'response 141')
     const snap = (window as any).snap as {
       pay: (
         token: string,
@@ -148,7 +147,6 @@ export default function CheckoutPage() {
         }
       ) => void;
     };
-    console.log(snap, 'snap')
     snap?.pay(data.token, {
       onSuccess: async () => {
         // ✅ Submit ticket to Firestore after payment success
@@ -157,10 +155,10 @@ export default function CheckoutPage() {
         formData.append("quantity", values.quantity);
         formData.append("price", event.price.toString());
         formData.append("userId", user.uid);
+        formData.append("customerName", `${values.firstName} ${values.lastName}`);
 
         try {
           const result = await processTicketPurchase(formData);
-          console.log(result , 'result 165')
           if (result.success) {
             toast({
               title: "Payment successful",

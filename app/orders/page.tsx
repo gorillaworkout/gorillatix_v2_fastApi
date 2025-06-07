@@ -63,7 +63,6 @@ export default function OrdersPage() {
               }
             }
           }
-          console.log(events, 'events tiket 75')
           setTicketEvents(events)
         } catch (err: any) {
           console.error("Error loading tickets:", err)
@@ -127,7 +126,7 @@ export default function OrdersPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `ticket-${ticket.id}.txt`
+    a.download = `${ticket.id}.txt`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -148,8 +147,6 @@ export default function OrdersPage() {
     const eventDate = new Date(event.date)
     return eventDate < today
   })
-  console.log(ticketEvents, 'ticketEvents');
-  console.log(tickets, 'tickets')
 
   if (loading || ticketsLoading) {
     return (
@@ -184,7 +181,6 @@ export default function OrdersPage() {
             {upcomingTickets.length > 0 ? (
               <div className="space-y-6">
                 {upcomingTickets.map((ticket) => {
-                  console.log(ticket,' ticket 195')
                   const event = ticketEvents[ticket.eventId]
                   if (!event) return null
 

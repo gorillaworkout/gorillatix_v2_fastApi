@@ -70,26 +70,19 @@ export interface TicketProps {
   totalPrice: number
   purchaseDate: Timestamp
   status: "confirmed" | "cancelled" | "used"
+  eventName: string
+  customerName: string
 }
-// Define the event type
-// export interface EventItem {
-//   id: string
-//   slug: string
-//   title: string
-//   description: string
-//   date: string
-//   time: string
-//   location: string
-//   venue: string
-//   address: string
-//   city?: string
-//   imageUrl: string
-//   price: number
-//   category: string
-//   ticketsAvailable: number
-//   ticketsSold: number
-//   organizer: string
-//   organizerDescription?: string
+
+// export interface Ticket {
+//   id?: string
+//   eventId: string
+//   userId: string
+//   quantity: number
+//   totalPrice: number
+//   purchaseDate: Timestamp
+//   status: "confirmed" | "cancelled" | "used"
+
 // }
 
 export interface EventInput {
@@ -129,4 +122,13 @@ export interface OrderInput {
   totalPrice: number
   status: "pending" | "completed" | "cancelled"
   paymentId?: string
+}
+
+// Types
+export interface FirestoreEvent extends Omit<EventItem, "id"> {
+  id?: string
+  createdAt: Timestamp
+  updatedAt: Timestamp
+  userId: string
+  slug: string
 }

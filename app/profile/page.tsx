@@ -92,7 +92,6 @@ export default function ProfilePage() {
               }
             }
           }
-          console.log(events, "events tiket 75");
           setTicketEvents(events);
         } catch (err: any) {
           console.error("Error loading tickets:", err);

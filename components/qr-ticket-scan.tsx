@@ -50,7 +50,12 @@ export default function TicketScanner() {
       const data = snap.data()
 
       if (data.status === "exchanged") {
-        setError("⚠️ Ticket has already been exchanged.")
+        setError(
+          `⚠️ Ticket is no longer valid for use.\n` +
+          `• Status: ${snap.data().status}\n` +
+          `• Customer: ${snap.data().customerName}\n\n` +
+          `This ticket has already been exchanged and cannot be reused.`
+        );
         setTicketData(data)
         return
       }
@@ -113,7 +118,7 @@ export default function TicketScanner() {
           </div>
 
           {error && (
-            <div className="p-3 bg-red-100 text-red-700 rounded-md font-medium">
+            <div className="p-3 bg-red-100 text-red-700 rounded-md font-medium whitespace-pre-line">
               {error}
             </div>
           )}
@@ -134,8 +139,8 @@ export default function TicketScanner() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-lg">Confirm Ticket Exchange</AlertDialogTitle>
             <div className="text-sm text-muted-foreground space-y-1">
-              <p><strong>Event ID:</strong> {ticketData?.eventId}</p>
-              <p><strong>Email:</strong> {ticketData?.email}</p>
+              <p><strong>Event Title:</strong> {ticketData?.eventName}</p>
+              <p><strong>Customer Name:</strong> {ticketData?.customerName}</p>
               <div>
                 <strong>Status:</strong>{" "}
                 <Badge variant={ticketData?.status === "confirmed" ? "default" : "destructive"}>

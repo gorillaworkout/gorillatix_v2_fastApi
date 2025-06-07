@@ -17,26 +17,8 @@ import {
 import { db, auth } from "./firebase"
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
-import { EventItem, Order, OrderInput } from "@/types/event"
+import { EventItem, FirestoreEvent, Order, OrderInput, TicketProps } from "@/types/event"
 
-// Types
-export interface FirestoreEvent extends Omit<EventItem, "id"> {
-  id?: string
-  createdAt: Timestamp
-  updatedAt: Timestamp
-  userId: string
-  slug: string
-}
-
-export interface Ticket {
-  id?: string
-  eventId: string
-  userId: string
-  quantity: number
-  totalPrice: number
-  purchaseDate: Timestamp
-  status: "confirmed" | "cancelled" | "used"
-}
 
 // Events Collection
 const eventsCollection = collection(db, "events")
@@ -190,7 +172,7 @@ export async function searchEvents(searchTerm: string) {
 }
 
 // Ticket Functions
-export async function purchaseTicket(eventId: string, quantity: number, price: number, userId: string) {
+export async function purchaseTicket(eventId: string, quantity: number, price: number, userId: string, customerName: string) {
   try {
     // Validate inputs
     if (!eventId || !userId || quantity <= 0 || price <= 0) {
@@ -218,13 +200,15 @@ export async function purchaseTicket(eventId: string, quantity: number, price: n
       }
 
       // Create the ticket
-      const ticketData: Omit<Ticket, "id"> = {
+      const ticketData: Omit<TicketProps, "id"> = {
         eventId,
         userId,
         quantity,
         totalPrice: price * quantity,
         purchaseDate: Timestamp.now(),
         status: "confirmed",
+        eventName: eventData.title,
+        customerName: customerName
       }
 
       // Update the event's available tickets
@@ -264,7 +248,7 @@ export async function getUserTickets(userId: string) {
     return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as Ticket[]
+    })) as TicketProps[]
   } catch (error) {
     console.error("Error getting user tickets:", error)
     throw error
@@ -277,7 +261,7 @@ export async function getTicketById(id: string) {
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Ticket
+      return { id: docSnap.id, ...docSnap.data() } as TicketProps
     } else {
       return null
     }
