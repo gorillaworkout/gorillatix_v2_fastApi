@@ -27,7 +27,6 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(10, { message: "Please enter a valid phone number" }),
   quantity: z.string().min(1, { message: "Please select quantity" }),
-  paymentMethod: z.string().min(1, { message: "Please select a payment method" }),
 })
 
 export default function CheckoutPage() {
@@ -103,7 +102,6 @@ export default function CheckoutPage() {
       email: user?.email || "",
       phone: "",
       quantity: "1",
-      paymentMethod: "",
     },
   })
 
@@ -112,47 +110,7 @@ export default function CheckoutPage() {
   const fees = subtotal * 0.05 // 5% service fee
   const total = subtotal + fees
 
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   if (!event || !user) return
 
-  //   setIsLoading(true)
-  //   setError(null)
-
-  //   try {
-  //     // Create form data for server action
-  //     const formData = new FormData()
-  //     formData.append("eventId", event.id)
-  //     formData.append("quantity", values.quantity)
-  //     formData.append("price", event.price.toString())
-  //     formData.append("userId", user.uid)
-
-  //     console.log("Submitting purchase with userId:", user.uid)
-
-  //     // Process the purchase using server action
-  //     const result = await processTicketPurchase(formData)
-
-  //     if (result.success) {
-  //       toast({
-  //         title: "Payment successful",
-  //         description: "Your tickets have been sent to your email.",
-  //       })
-
-  //       router.push(`/payment-success?ticketId=${result.ticketId}`)
-  //     } else {
-  //       setError(result.message || "Payment failed. Please try again.")
-  //     }
-  //   } catch (error) {
-  //     console.error("Checkout error:", error)
-  //     setError(error instanceof Error ? error.message : "An error occurred while processing your purchase")
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Payment failed",
-  //       description: "Please try again later.",
-  //     })
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }
   async function onSubmit(values: z.infer<typeof formSchema>) {
   if (!event || !user) return;
 
@@ -178,7 +136,7 @@ export default function CheckoutPage() {
 
     if (!response.ok) throw new Error("Failed to create transaction");
     const data: { token: string } = await response.json();
-
+    console.log(response, 'response 141')
     const snap = (window as any).snap as {
       pay: (
         token: string,
@@ -190,7 +148,7 @@ export default function CheckoutPage() {
         }
       ) => void;
     };
-
+    console.log(snap, 'snap')
     snap?.pay(data.token, {
       onSuccess: async () => {
         // ✅ Submit ticket to Firestore after payment success
@@ -202,7 +160,7 @@ export default function CheckoutPage() {
 
         try {
           const result = await processTicketPurchase(formData);
-
+          console.log(result , 'result 165')
           if (result.success) {
             toast({
               title: "Payment successful",
@@ -393,32 +351,6 @@ export default function CheckoutPage() {
               </div>
 
               <Separator />
-
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Payment Method</h2>
-                <FormField
-                  control={form.control}
-                  name="paymentMethod"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Select Payment Method</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select payment method" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="credit_card">Credit Card</SelectItem>
-                          <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                          <SelectItem value="e_wallet">E-Wallet</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
 
               <div className="pt-4">
                 <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
