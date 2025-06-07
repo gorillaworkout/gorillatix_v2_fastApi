@@ -18,6 +18,9 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useEvents } from "@/context/event-context"
+import { storage } from "@/lib/firebase"
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import { createEvent } from "@/lib/firebase-service"
 
 const formSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters" }),
@@ -30,13 +33,20 @@ const formSchema = z.object({
   city: z.string().min(2, { message: "City must be at least 2 characters" }),
   price: z.string().min(1, { message: "Please enter a price" }),
   totalTickets: z.string().min(1, { message: "Please enter total tickets" }),
+  image: z
+    .any()
+    .refine(
+      (file) => !file || file instanceof File || file instanceof Blob,
+      { message: "Please upload a valid image" }
+    )
+    .optional(),
 })
 
 export default function NewEventPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const { addEvent } = useEvents()
+  // const { addEvent } = useEvents()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,23 +54,33 @@ export default function NewEventPage() {
       title: "",
       description: "",
       category: "",
+      date: new Date(), // atau `undefined` kalau opsional
       time: "",
       venue: "",
       address: "",
       city: "",
       price: "",
       totalTickets: "",
+      image: z.any().refine((file) => file instanceof File, {
+        message: "Image is required",
+      }),
     },
   })
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
 
     try {
-      // Create a new event using the context (which now uses Firebase)
-      const location = `${values.venue}, ${values.city}`
+      // ✅ Upload image ke Firebase Storage
+      const imageFile = values.image as File
 
-      const newEvent = await addEvent({
+      const storageRef = ref(storage, `event-images/${Date.now()}-${imageFile.name}`)
+      const snapshot = await uploadBytes(storageRef, imageFile)
+      const downloadURL = await getDownloadURL(snapshot.ref)
+
+      const location = `${values.address}, ${values.city}`
+      const newEvent = await createEvent({
         title: values.title,
         description: values.description,
         category: values.category,
@@ -69,14 +89,16 @@ export default function NewEventPage() {
         venue: values.venue,
         address: values.address,
         location: location,
-        imageUrl: "/placeholder.svg?height=400&width=800",
+        imageUrl: downloadURL,
         price: Number.parseFloat(values.price),
         ticketsAvailable: Number.parseInt(values.totalTickets),
         ticketsSold: 0,
-        organizer: "Your Organization", // This would come from the user's profile in a real app
-        organizerDescription: "Event organizer description",
+        organizer: "ICA",
+        organizerDescription: values.description,
+        status: "Active",
+        slug: "",
+        userId: ""
       })
-
       if (newEvent) {
         toast({
           title: "Event created",
@@ -272,6 +294,31 @@ export default function NewEventPage() {
                       <Input type="number" min="0" step="0.01" {...field} />
                     </FormControl>
                     <FormDescription>The price per ticket in Rupiah.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Image Upload Field */}
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        // onChange={(e) => field.onChange(e.target.files?.[0])}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            form.setValue("image", file)
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>Upload an image to represent your event.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
