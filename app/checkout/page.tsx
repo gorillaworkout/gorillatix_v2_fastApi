@@ -20,6 +20,7 @@ import { processTicketPurchase } from "./actions"
 import { useAuth } from "@/components/auth-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { formatRupiah } from "@/lib/utils"
+import Loader from "@/components/loading";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "First name is required" }),
@@ -30,11 +31,11 @@ const formSchema = z.object({
 })
 
 export default function CheckoutPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false) // isLoading untuk button
   const [event, setEvent] = useState<any>(null)
-  const [isLoadingEvent, setIsLoadingEvent] = useState(true)
+  const [isLoadingEvent, setIsLoadingEvent] = useState(true) // isLoading load data event
   const [error, setError] = useState<string | null>(null)
-
+const [isLoadingPayment, setIsLoadingPayment] = useState(false) // isLoading payment
   const router = useRouter()
   const searchParams = useSearchParams()
   const eventId = searchParams.get("eventId")
@@ -107,7 +108,7 @@ export default function CheckoutPage() {
 
   const quantity = Number.parseInt(form.watch("quantity") || "1")
   const subtotal = event && event.price ? event.price * quantity : 0
-  const fees = subtotal * 0.05 // 5% service fee
+  const fees =  Math.ceil(subtotal * 0.007)  // ✅ 0.7% QRIS fee
   const total = subtotal + fees
 
 
@@ -116,7 +117,6 @@ export default function CheckoutPage() {
 
   setIsLoading(true);
   setError(null);
-
   try {
     // Prepare transaction data for Midtrans
     const transactionPayload = {
@@ -133,8 +133,8 @@ export default function CheckoutPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(transactionPayload),
     });
-
     if (!response.ok) throw new Error("Failed to create transaction");
+    setIsLoadingPayment(true)
     const data: { token: string } = await response.json();
     const snap = (window as any).snap as {
       pay: (
@@ -166,6 +166,7 @@ export default function CheckoutPage() {
             });
 
             router.push(`/payment-success?ticketId=${result.ticketId}`);
+            setIsLoadingPayment(false)
           } else {
             setError(result.message || "Failed to save ticket after payment.");
             toast({
@@ -173,6 +174,7 @@ export default function CheckoutPage() {
               title: "Ticket Processing Failed",
               description: "Your payment succeeded but ticket creation failed.",
             });
+            setIsLoadingPayment(false)
           }
         } catch (error) {
           console.error("Ticket process error:", error);
@@ -182,6 +184,7 @@ export default function CheckoutPage() {
             title: "Ticket Save Error",
             description: "Please contact support.",
           });
+          setIsLoadingPayment(false)
         }
       },
 
@@ -190,6 +193,7 @@ export default function CheckoutPage() {
           title: "Awaiting payment",
           description: "Please complete the transaction.",
         });
+        setIsLoadingPayment(false)
       },
 
       onError: () => {
@@ -198,6 +202,7 @@ export default function CheckoutPage() {
           title: "Payment failed",
           description: "Please try again later.",
         });
+        setIsLoadingPayment(false)
       },
 
       onClose: () => {
@@ -205,6 +210,7 @@ export default function CheckoutPage() {
           title: "Payment cancelled",
           description: "You closed the payment popup.",
         });
+        setIsLoadingPayment(false)
       },
     });
   } catch (error) {
@@ -214,20 +220,17 @@ export default function CheckoutPage() {
       title: "Payment failed",
       description: "An unexpected error occurred. Please try again.",
     });
+      setIsLoadingPayment(false)
   } finally {
     setIsLoading(false);
   }
 }
 
+  if (isLoadingPayment) return <Loader title="Preparing your tickets" />;
 
   if (authLoading || isLoadingEvent) {
     return (
-      <div className="container flex h-[50vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p>Loading event details...</p>
-        </div>
-      </div>
+      <Loader title="Loading event details..."/>
     )
   }
 
