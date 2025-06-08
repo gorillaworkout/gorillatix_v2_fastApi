@@ -1,4 +1,5 @@
 // pages/payment/finish.tsx
+"use client"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 import Head from "next/head"

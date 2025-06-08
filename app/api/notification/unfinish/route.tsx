@@ -1,4 +1,5 @@
 // pages/payment/unfinish.tsx
+"use client"
 import { useRouter } from "next/router"
 import Head from "next/head"
 
