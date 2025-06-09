@@ -64,8 +64,8 @@ export function SiteFooter() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2 text-sm">
-              <li className="text-muted-foreground">Email: support@gorillatix.com</li>
-              <li className="text-muted-foreground">Phone: +1 (555) 123-4567</li>
+              <li className="text-muted-foreground">Email: gorillatix@gmail.com</li>
+              <li className="text-muted-foreground">Phone: +62 851-3352-4900</li>
               <li className="text-muted-foreground">Address: 123 Ticket Street, Event City</li>
             </ul>
           </div>

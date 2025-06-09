@@ -19,7 +19,7 @@ export default function AboutPage() {
           <div>
             <h2 className="text-3xl font-bold mb-4">Our Story</h2>
             <p className="mb-4">
-              Founded in 2023, GorillaTix was born from a simple idea: make event ticketing simple, secure, and
+              Founded in 2025, GorillaTix was born from a simple idea: make event ticketing simple, secure, and
               accessible to everyone. We noticed how complicated and frustrating buying tickets could be, with hidden
               fees, confusing interfaces, and limited options.
             </p>
@@ -155,25 +155,25 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-16">
           {[
             {
-              name: "Alex Johnson",
+              name: "Bayu Darmawan",
               role: "CEO & Founder",
-              image: "/placeholder.svg?height=300&width=300",
+              image: "/images/bayu.jpeg",
             },
-            {
-              name: "Sarah Chen",
-              role: "CTO",
-              image: "/placeholder.svg?height=300&width=300",
-            },
-            {
-              name: "Michael Rodriguez",
-              role: "Head of Operations",
-              image: "/placeholder.svg?height=300&width=300",
-            },
-            {
-              name: "Priya Patel",
-              role: "Customer Experience",
-              image: "/placeholder.svg?height=300&width=300",
-            },
+            // {
+            //   name: "Sarah Chen",
+            //   role: "CTO",
+            //   image: "/placeholder.svg?height=300&width=300",
+            // },
+            // {
+            //   name: "Michael Rodriguez",
+            //   role: "Head of Operations",
+            //   image: "/placeholder.svg?height=300&width=300",
+            // },
+            // {
+            //   name: "Priya Patel",
+            //   role: "Customer Experience",
+            //   image: "/placeholder.svg?height=300&width=300",
+            // },
           ].map((member, index) => (
             <div key={index} className="text-center">
               <div className="relative h-48 w-48 mx-auto mb-4 rounded-full overflow-hidden">
@@ -192,7 +192,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="bg-muted rounded-lg p-8 text-center mb-16">
+        {/* <div className="bg-muted rounded-lg p-8 text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Join Our Journey</h2>
           <p className="text-xl mb-6 max-w-3xl mx-auto">
             We're always looking for talented individuals who are passionate about events and technology.
@@ -200,7 +200,7 @@ export default function AboutPage() {
           <Button asChild size="lg">
             <Link href="/careers">View Open Positions</Link>
           </Button>
-        </div>
+        </div> */}
 
         <div className="text-center">
           <h2 className="text-3xl font-bold mb-4">Get In Touch</h2>

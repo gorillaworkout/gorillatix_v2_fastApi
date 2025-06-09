@@ -66,6 +66,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta property="og:image" content="https://www.gorillatix.com/images/gorillatix-logo.png" />
+        <meta name="twitter:image" content="https://www.gorillatix.com/images/gorillatix-logo.png" />
         <script
           async
           src="https://app.sandbox.midtrans.com/snap/snap.js"
