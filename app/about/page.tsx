@@ -30,7 +30,7 @@ export default function AboutPage() {
           </div>
           <div className="relative h-[400px] rounded-lg overflow-hidden">
             <Image
-              src="/placeholder.svg?height=400&width=600"
+              src="/images/hero_gorillatix.webp?height=400&width=600"
               alt="GorillaTix team"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -144,7 +144,7 @@ export default function AboutPage() {
 
         <Separator className="my-16" />
 
-        <div className="text-center mb-12">
+        {/* <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Our Team</h2>
           <p className="text-xl max-w-3xl mx-auto">
             Meet the passionate individuals behind GorillaTix who work tirelessly to bring you the best ticketing
@@ -159,21 +159,6 @@ export default function AboutPage() {
               role: "CEO & Founder",
               image: "/images/bayu.jpeg",
             },
-            // {
-            //   name: "Sarah Chen",
-            //   role: "CTO",
-            //   image: "/placeholder.svg?height=300&width=300",
-            // },
-            // {
-            //   name: "Michael Rodriguez",
-            //   role: "Head of Operations",
-            //   image: "/placeholder.svg?height=300&width=300",
-            // },
-            // {
-            //   name: "Priya Patel",
-            //   role: "Customer Experience",
-            //   image: "/placeholder.svg?height=300&width=300",
-            // },
           ].map((member, index) => (
             <div key={index} className="text-center">
               <div className="relative h-48 w-48 mx-auto mb-4 rounded-full overflow-hidden">
@@ -190,7 +175,7 @@ export default function AboutPage() {
               <p className="text-muted-foreground">{member.role}</p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* <div className="bg-muted rounded-lg p-8 text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Join Our Journey</h2>

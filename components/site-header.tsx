@@ -113,12 +113,12 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           {!loading && user && !isSigningOut ? (
             <>
-              <Button variant="ghost" size="icon" asChild>
+              {/* <Button variant="ghost" size="icon" asChild>
                 <Link href="/cart">
                   <ShoppingCart className="h-5 w-5" />
                   <span className="sr-only">Cart</span>
                 </Link>
-              </Button>
+              </Button> */}
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

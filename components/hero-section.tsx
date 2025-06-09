@@ -39,9 +39,9 @@ export function HeroSection() {
           <div className="flex items-center justify-center">
             <div className="relative aspect-video overflow-hidden rounded-xl">
               <img
-                src="/placeholder.svg?height=500&width=800"
-                alt="Featured events collage"
-                className="object-cover w-full h-full"
+                src="/images/hero_gorillatix.webp?height=500&width=800"
+                alt="Featured events"
+                className="object-cover w-full h-full rounded-xl"
               />
             </div>
           </div>

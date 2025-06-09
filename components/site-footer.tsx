@@ -66,7 +66,7 @@ export function SiteFooter() {
             <ul className="space-y-2 text-sm">
               <li className="text-muted-foreground">Email: gorillatix@gmail.com</li>
               <li className="text-muted-foreground">Phone: +62 851-3352-4900</li>
-              <li className="text-muted-foreground">Address: 123 Ticket Street, Event City</li>
+              <li className="text-muted-foreground">Address: Jl. Gatot Subroto No. 999, Jakarta, Indonesia</li>
             </ul>
           </div>
         </div>
