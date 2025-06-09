@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    unoptimized: false,
     domains: ['www.gorillatix.com'],
   },
 }

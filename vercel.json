@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "gorillatix.com" }],
+      "destination": "https://www.gorillatix.com/:1",
+      "permanent": true
+    }
+  ]
+}
