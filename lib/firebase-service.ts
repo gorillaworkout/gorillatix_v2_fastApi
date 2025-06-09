@@ -78,21 +78,35 @@ export async function getEventById(id: string) {
   }
 }
 
-export async function getEventBySlug(slug: string) {
-  try {
-    const q = query(eventsCollection, where("slug", "==", slug), limit(1))
-    const querySnapshot = await getDocs(q)
+// export async function getEventBySlug(slug: string) {
+//   try {
+//     const q = query(eventsCollection, where("slug", "==", slug), limit(1))
+//     const querySnapshot = await getDocs(q)
 
-    if (!querySnapshot.empty) {
-      const doc = querySnapshot.docs[0]
-      return { id: doc.id, ...doc.data() } as EventItem
-    } else {
-      return null
-    }
-  } catch (error) {
-    console.error("Error getting event by slug:", error)
-    throw error
+//     if (!querySnapshot.empty) {
+//       const doc = querySnapshot.docs[0]
+//       return { id: doc.id, ...doc.data() } as EventItem
+//     } else {
+//       return null
+//     }
+//   } catch (error) {
+//     console.error("Error getting event by slug:", error)
+//     throw error
+//   }
+// }
+export async function getEventBySlug(slug: string) {
+  const q = query(collection(db, "events"), where("slug", "==", slug));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    return null;
   }
+
+  const doc = snapshot.docs[0];
+  return {
+    id: doc.id,
+    ...doc.data(),
+  } as EventItem;
 }
 
 export async function updateEvent(id: string, eventData: Partial<FirestoreEvent>) {

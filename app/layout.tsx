@@ -67,6 +67,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="google-site-verification" content="bmaYcGO0TFIfmsT1g0dt7F6c4NO_DWIhfPWrvn8QPX8" />
+        
         <meta property="og:image" content="https://www.gorillatix.com/images/gorillatix-logo.png" />
         <meta name="twitter:image" content="https://www.gorillatix.com/images/gorillatix-logo.png" />
         <script

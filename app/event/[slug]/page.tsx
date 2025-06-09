@@ -1,5 +1,5 @@
 "use client";
-export const dynamic = 'force-dynamic'; // required for dynamic routes that aren't pre-rendered
+export const dynamic = "force-dynamic"; // required for dynamic routes that aren't pre-rendered
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -13,12 +13,15 @@ import { formatDate, formatRupiah } from "@/lib/utils";
 import { useEvents } from "@/context/event-context";
 import { EventItem } from "@/types/event";
 import Head from "next/head";
-import LocationSection from './../../../components/locatioSection';
+import LocationSection from "./../../../components/locatioSection";
+import { useRouter } from "next/navigation";
+
 export default function EventPage() {
   const params = useParams();
   const { events, getEventBySlug } = useEvents();
   const [event, setEvent] = useState<EventItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchEvent() {
@@ -47,6 +50,13 @@ export default function EventPage() {
 
     fetchEvent();
   }, [params.slug, events, getEventBySlug]);
+  
+  useEffect(() => {
+    if (!loading && !event) {
+      router.push("/");
+    }
+  }, [loading, event, router]);
+
 
   if (loading) {
     return (
@@ -60,9 +70,8 @@ export default function EventPage() {
   }
 
   if (!event) {
-    notFound();
+    return null;
   }
-
   return (
     <>
       {event && (
@@ -165,12 +174,14 @@ export default function EventPage() {
                 <div className="mt-4 rounded-lg overflow-hidden h-[300px] bg-muted">
                   {/* Map would go here in a real implementation */}
                   <div className="bg-background w-full h-full flex items-center justify-center text-muted-foreground">
-                    <LocationSection event={{
-                      venue: event.venue,
-                      address: event.address,
-                      latitude: -6.996301771459569,
-                      longitude: 107.52967155378118
-                    }}/>
+                    <LocationSection
+                      event={{
+                        venue: event.venue,
+                        address: event.address,
+                        latitude: -6.996301771459569,
+                        longitude: 107.52967155378118,
+                      }}
+                    />
                     {/* -6.996301771459569, 107.52967155378118 */}
                   </div>
                 </div>

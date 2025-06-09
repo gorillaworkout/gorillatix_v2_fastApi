@@ -45,9 +45,11 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
   // Load events from Firestore on mount
   const fetchEvents = async () => {
+    console.log('fetch event is running')
     setLoading(true)
     try {
       const fetchedEvents = await getFirestoreEvents()
+      console.log(fetchedEvents, 'fetched events')
 
       if (fetchedEvents && fetchedEvents.length > 0) {
         // Ensure all events have slugs
@@ -55,6 +57,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
           ...event,
           slug: event.slug || createSlug(event.title),
         }))
+        console.log(eventsWithSlugs, 'event with slugs')
         setEvents(eventsWithSlugs)
       } else {
         // Empty array if no events found
@@ -79,70 +82,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
   const refreshEvents = async () => {
     await fetchEvents()
   }
-
-  // Add a new event
-//  const addEvent = async (event: Omit<EventItem, "id" | "slug">) => {
-//   console.log(event, 'event context')
-
-//   try {
-//     if (!user) {
-//       throw new Error("You must be logged in to add an event")
-//     }
-
-//     const slug = createSlug(event.title)
-
-//     // ✅ Create clean event object for Firestore
-//     const newEvent = await createFirestoreEvent({
-//       ...event,
-//       slug,
-//       userId: user.uid,
-//       bubbles: false,
-//       cancelBubble: false,
-//       cancelable: false,
-//       composed: false,
-//       currentTarget: null,
-//       defaultPrevented: false,
-//       eventPhase: 0,
-//       isTrusted: false,
-//       returnValue: false,
-//       srcElement: null,
-//       target: null,
-//       timeStamp: 0,
-//       type: "",
-//       composedPath: function (): EventTarget[] {
-//         throw new Error("Function not implemented.")
-//       },
-//       initEvent: function (type: string, bubbles?: boolean, cancelable?: boolean): void {
-//         throw new Error("Function not implemented.")
-//       },
-//       preventDefault: function (): void {
-//         throw new Error("Function not implemented.")
-//       },
-//       stopImmediatePropagation: function (): void {
-//         throw new Error("Function not implemented.")
-//       },
-//       stopPropagation: function (): void {
-//         throw new Error("Function not implemented.")
-//       },
-//       NONE: 0,
-//       CAPTURING_PHASE: 1,
-//       AT_TARGET: 2,
-//       BUBBLING_PHASE: 3
-//     })
-
-//     if (newEvent) {
-//       // ✅ Add to local state
-//       setEvents((prev) => [...prev, newEvent as EventItem])
-//       return newEvent as EventItem
-//     }
-
-//     return null
-//   } catch (err) {
-//     console.error("Error adding event:", err)
-//     setError("Failed to add event")
-//     return null
-//   }
-// }
 
   // Update an existing event
   const updateEvent = async (id: string, updatedEvent: Partial<EventItem>) => {
@@ -204,6 +143,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
   // Get an event by slug
   const getEventBySlug = async (slug: string) => {
+    console.log(slug, 'slug 143')
     try {
       // Check local state first
       const localEvent = events.find((event) => event.slug === slug)
@@ -211,6 +151,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
       // If not found locally, fetch from Firestore
       const event = await getFirestoreEventBySlug(slug)
+      console.log(event, 'event 151 setelah get firestore')
       if (event) return event as EventItem
 
       // If still not found, refresh events and try again
