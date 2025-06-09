@@ -94,7 +94,7 @@ export async function getRecentSales(limitCount = 5): Promise<RecentSale[]> {
         id: ticketDoc.id,
         userId: ticketData.userId,
         userName: userData?.displayName || "Anonymous User",
-        userAvatar: userData?.photoURL || "/placeholder.svg?height=36&width=36",
+        userAvatar: userData?.photoURL || "/favicon-96x96.png?height=36&width=36",
         eventName: eventData?.title || "Unknown Event",
         quantity: ticketData.quantity || 1,
         totalPrice: ticketData.totalPrice || 0,

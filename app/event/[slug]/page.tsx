@@ -146,7 +146,7 @@ export default function EventPage() {
               <div className="relative w-full aspect-video">
                 <Image
                   src={
-                    event.imageUrl || `/placeholder.svg?height=400&width=800`
+                    event.imageUrl || `/favicon-96x96.png?height=400&width=800`
                   }
                   alt={event.title}
                   fill

@@ -163,7 +163,7 @@ export default function AboutPage() {
             <div key={index} className="text-center">
               <div className="relative h-48 w-48 mx-auto mb-4 rounded-full overflow-hidden">
                 <Image
-                  src={member.image || "/placeholder.svg"}
+                  src={member.image || "/favicon-96x96.png"}
                   alt={member.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"

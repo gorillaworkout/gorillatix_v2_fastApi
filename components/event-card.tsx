@@ -27,7 +27,7 @@ export function EventCard({ event }: EventCardProps) {
     <Card className="overflow-hidden">
       <div className="aspect-[16/9] relative">
         <Image
-          src={imageUrl || `/placeholder.svg?height=225&width=400`}
+          src={imageUrl || `/favicon-96x96.png?height=225&width=400`}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

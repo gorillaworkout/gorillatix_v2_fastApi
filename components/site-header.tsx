@@ -126,7 +126,7 @@ export function SiteHeader() {
                     {user.photoURL ? (
                       <div className="relative h-8 w-8 rounded-full overflow-hidden">
                         <Image
-                          src={user.photoURL || "/placeholder.svg"}
+                          src={user.photoURL || "/favicon-96x96.png"}
                           alt={user.displayName || "User"}
                           fill
                           sizes="32px"

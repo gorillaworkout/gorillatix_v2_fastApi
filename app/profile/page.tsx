@@ -196,7 +196,7 @@ export default function ProfilePage() {
                 <div className="relative h-24 w-24 mb-4 overflow-hidden rounded-full">
                   {user?.photoURL ? (
                     <Image
-                      src={user.photoURL || "/placeholder.svg"}
+                      src={user.photoURL || "/favicon-96x96.png"}
                       alt={user.displayName || "Profile"}
                       fill
                       sizes="96px"

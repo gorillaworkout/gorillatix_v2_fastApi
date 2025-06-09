@@ -47,7 +47,7 @@ export function AdminRecentSales() {
       {sales.map((sale) => (
         <div key={sale.id} className="flex items-center">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={sale.userAvatar || "/placeholder.svg"} alt="Avatar" />
+            <AvatarImage src={sale.userAvatar || "/favicon-96x96.png"} alt="Avatar" />
             <AvatarFallback>{sale.userName.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="ml-4 space-y-1">

@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: "GorillaTix",
     images: [
       {
-        url: "https://www.gorillatix.com/images/gorillatix-logo.png",
+        url: "https://www.gorillatix.com/favicon-96x96.png",
         width: 1200,
         height: 630,
         alt: "GorillaTix - Beli Tiket Online",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     description:
       "GorillaTix adalah platform beli tiket online terpercaya untuk konser dan event. Langsung dapat e-ticket!",
     site: "@gorillatix",
-    images: ["https://www.gorillatix.com/images/gorillatix-logo.png"],
+    images: ["https://www.gorillatix.com/favicon-96x96.png"],
   },
   metadataBase: new URL("https://www.gorillatix.com"),
 };
@@ -69,14 +69,14 @@ export default function RootLayout({
       <head>
         <meta name="google-site-verification" content="bmaYcGO0TFIfmsT1g0dt7F6c4NO_DWIhfPWrvn8QPX8" />
         
-        <meta property="og:image" content="https://www.gorillatix.com/images/gorillatix-logo.png" />
-        <meta name="twitter:image" content="https://www.gorillatix.com/images/gorillatix-logo.png" />
+        <meta property="og:image" content="https://www.gorillatix.com/favicon-96x96.png" />
+        <meta name="twitter:image" content="https://www.gorillatix.com/favicon-96x96.png" />
         <script
           async
           src="https://app.sandbox.midtrans.com/snap/snap.js"
           data-client-key={midtransClientKey}
         />
-        <link rel="icon" type="image/png" href="/images/gorillatix-logo.png" />
+        <link rel="icon" type="image/png" href="/favicon-96x96.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -85,7 +85,7 @@ export default function RootLayout({
               "@type": "Organization",
               name: "GorillaTix",
               url: "https://www.gorillatix.com",
-              logo: "https://www.gorillatix.com/images/gorillatix-logo.png",
+              logo: "https://www.gorillatix.com/favicon-96x96.png",
               sameAs: [
                 "https://www.instagram.com/gorillatix",
                 "https://www.facebook.com/gorillatix",

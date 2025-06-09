@@ -11,7 +11,7 @@ const events = [
     location: "Central Park, New York",
     venue: "Central Park Great Lawn",
     address: "Central Park, New York, NY 10024",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "Join us for the biggest music festival of the summer featuring top artists from around the world. Experience amazing performances across multiple stages, delicious food vendors, and a vibrant atmosphere.",
     price: 49.99,
@@ -29,7 +29,7 @@ const events = [
     location: "Convention Center, San Francisco",
     venue: "San Francisco Convention Center",
     address: "747 Howard St, San Francisco, CA 94103",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "The premier tech conference bringing together industry leaders, innovators, and developers. Featuring keynote speeches, workshops, and networking opportunities.",
     price: 149.99,
@@ -47,7 +47,7 @@ const events = [
     location: "Laugh Factory, Los Angeles",
     venue: "The Laugh Factory",
     address: "8001 Sunset Blvd, Los Angeles, CA 90046",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "A night of non-stop laughter featuring the best stand-up comedians in the country. Come enjoy drinks and entertainment in a relaxed atmosphere.",
     price: 24.99,
@@ -65,7 +65,7 @@ const events = [
     location: "Madison Square Garden, New York",
     venue: "Madison Square Garden",
     address: "4 Pennsylvania Plaza, New York, NY 10001",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "The ultimate basketball showdown featuring the top teams competing for the championship title. Experience the thrill of live sports at its finest.",
     price: 59.99,
@@ -83,7 +83,7 @@ const events = [
     location: "Modern Art Museum, Chicago",
     venue: "Chicago Modern Art Museum",
     address: "220 E Chicago Ave, Chicago, IL 60611",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "Explore contemporary art from renowned artists around the world. This exhibition features paintings, sculptures, and interactive installations that challenge conventional perspectives.",
     price: 35.0,
@@ -102,7 +102,7 @@ const events = [
     location: "Waterfront Park, Seattle",
     venue: "Seattle Waterfront Park",
     address: "1401 Alaskan Way, Seattle, WA 98101",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "Indulge in culinary delights from top chefs and sample premium wines from local and international vineyards. A feast for all the senses!",
     price: 75.0,
@@ -121,7 +121,7 @@ const events = [
     location: "Club Nebula, Miami",
     venue: "Club Nebula",
     address: "1235 Washington Ave, Miami Beach, FL 33139",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "Dance the night away with world-class DJs spinning the latest electronic music. Featuring state-of-the-art sound systems and immersive light shows.",
     price: 45.0,
@@ -139,7 +139,7 @@ const events = [
     location: "Broadway Theater, New York",
     venue: "Broadway Theater",
     address: "1681 Broadway, New York, NY 10019",
-    imageUrl: "/placeholder.svg?height=400&width=800",
+    imageUrl: "/favicon-96x96.png?height=400&width=800",
     description:
       "Experience the magic of Broadway with this award-winning musical production. Featuring stunning performances, elaborate costumes, and unforgettable music.",
     price: 120.0,
