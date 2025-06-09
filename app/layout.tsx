@@ -76,6 +76,7 @@ export default function RootLayout({
           src="https://app.sandbox.midtrans.com/snap/snap.js"
           data-client-key={midtransClientKey}
         />
+        <link rel="icon" type="image/png" href="/images/gorillatix-logo.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
