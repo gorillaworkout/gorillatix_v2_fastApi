@@ -1,11 +1,11 @@
 "use client";
+export const dynamic = 'force-dynamic'; // required for dynamic routes that aren't pre-rendered
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Ticket, Loader2 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +13,7 @@ import { formatDate, formatRupiah } from "@/lib/utils";
 import { useEvents } from "@/context/event-context";
 import { EventItem } from "@/types/event";
 import Head from "next/head";
+import LocationSection from './../../../components/locatioSection';
 export default function EventPage() {
   const params = useParams();
   const { events, getEventBySlug } = useEvents();
@@ -163,8 +164,14 @@ export default function EventPage() {
                 <p className="text-muted-foreground">{event.address}</p>
                 <div className="mt-4 rounded-lg overflow-hidden h-[300px] bg-muted">
                   {/* Map would go here in a real implementation */}
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    Interactive Map
+                  <div className="bg-background w-full h-full flex items-center justify-center text-muted-foreground">
+                    <LocationSection event={{
+                      venue: event.venue,
+                      address: event.address,
+                      latitude: -6.996301771459569,
+                      longitude: 107.52967155378118
+                    }}/>
+                    {/* -6.996301771459569, 107.52967155378118 */}
                   </div>
                 </div>
               </div>
