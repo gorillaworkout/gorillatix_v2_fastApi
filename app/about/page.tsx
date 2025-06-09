@@ -30,7 +30,7 @@ export default function AboutPage() {
           </div>
           <div className="relative h-[400px] rounded-lg overflow-hidden">
             <Image
-              src="/images/hero_gorillatix.webp?height=400&width=600"
+              src="/images/hero_gorillatix.webp"
               alt="GorillaTix team"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
