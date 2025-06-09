@@ -1,9 +1,9 @@
 {
   "redirects": [
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "has": [{ "type": "host", "value": "gorillatix.com" }],
-      "destination": "https://www.gorillatix.com/:1",
+      "destination": "https://www.gorillatix.com/:path*",
       "permanent": true
     }
   ]
