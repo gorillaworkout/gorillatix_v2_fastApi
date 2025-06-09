@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { SearchForm } from "@/components/search-form"
-
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { SearchForm } from "@/components/search-form";
+import Image from "next/image";
 export function HeroSection() {
   return (
     <section className="py-12 md:py-16 lg:py-20">
@@ -13,7 +13,8 @@ export function HeroSection() {
                 Find and Book Your Next Event
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Discover concerts, sports, theater, and more. Secure your tickets with GorillaTix.
+                Discover concerts, sports, theater, and more. Secure your
+                tickets with GorillaTix.
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -37,16 +38,19 @@ export function HeroSection() {
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <div className="relative aspect-video overflow-hidden rounded-xl">
-              <img
+            <div className="relative aspect-video overflow-hidden rounded-xl w-full h-full">
+              <Image
                 src="/images/hero_gorillatix.webp"
                 alt="Featured events"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover w-full h-full rounded-xl"
+                priority={true}
               />
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

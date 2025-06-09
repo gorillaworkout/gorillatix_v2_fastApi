@@ -8,7 +8,7 @@ const nextConfig = {
   },
   images: {
     unoptimized: false,
-    domains: ['www.gorillatix.com'],
+    domains: ['www.gorillatix.com','firebasestorage.googleapis.com','lh3.googleusercontent.com'],
   },
 }
 
