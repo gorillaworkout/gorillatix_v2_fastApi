@@ -84,7 +84,7 @@ export function SiteHeader() {
           <Link href="/" className="flex items-center space-x-2">
             <div className="relative h-10 w-10">
               <Image
-                src="/images/gorillatix-logo.png"
+                src="/favicon-96x96.png"
                 alt="GorillaTix Logo"
                 fill
                 sizes="40px"
@@ -182,7 +182,7 @@ export function SiteHeader() {
               <div className="flex items-center mb-6">
                 <div className="relative h-8 w-8 mr-2">
                   <Image
-                    src="/images/gorillatix-logo.png"
+                    src="/favicon-96x96.png"
                     alt="GorillaTix Logo"
                     fill
                     sizes="32px"

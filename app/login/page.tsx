@@ -80,7 +80,7 @@ export default function LoginPage() {
           <div className="mb-4 mt-2">
             <div className="relative h-24 w-24">
               <Image
-                src="/images/gorillatix-logo.png"
+                src="/favicon-96x96.png"
                 alt="GorillaTix Logo"
                 fill
                 // sizes="96px"
