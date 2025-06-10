@@ -40,7 +40,7 @@ export function HeroSection() {
           <div className="flex items-center justify-center">
             <div className="relative aspect-video overflow-hidden rounded-xl w-full h-full">
               <Image
-                src="/images/hero_gorillatix.webp"
+                src="/images/hero_logo_gtix.webp"
                 alt="Featured events"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
