@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-
-export async function GET(request: Request) {
+// request: Request // This is a Next.js-specific type you can put it inside Get for now i deleted cause its not used
+export async function GET() {
   return NextResponse.json(
     {
       message: "Authentication is currently disabled",
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   )
 }
 
-export async function POST(request: Request) {
+export async function POST() {
   return NextResponse.json(
     {
       message: "Authentication is currently disabled",

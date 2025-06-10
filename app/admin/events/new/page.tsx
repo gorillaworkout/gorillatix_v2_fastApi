@@ -35,7 +35,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useEvents } from "@/context/event-context";
 import { storage } from "@/lib/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { createEvent } from "@/lib/firebase-service";
@@ -445,7 +444,7 @@ export default function NewEventPage() {
               <FormField
                 control={form.control}
                 name="image"
-                render={({ field }) => (
+                render={({ }) => (
                   <FormItem>
                     <FormLabel>Event Image</FormLabel>
                     <FormControl>

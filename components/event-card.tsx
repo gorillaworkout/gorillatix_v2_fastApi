@@ -18,11 +18,9 @@ interface EventCardProps {
 
 export function EventCard({ event }: EventCardProps) {
   const {
-    id,
     slug,
     title,
     date,
-    location,
     imageUrl,
     venue,
     price,

@@ -15,7 +15,7 @@ import {
   runTransaction,
 } from "firebase/firestore"
 import { db, auth } from "./firebase"
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
+// import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 import { EventItem, FirestoreEvent, Order, OrderInput, TicketProps } from "@/types/event"
 

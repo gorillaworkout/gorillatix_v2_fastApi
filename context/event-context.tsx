@@ -3,15 +3,13 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import {
   getEvents as getFirestoreEvents,
-  createEvent as createFirestoreEvent,
   updateEvent as updateFirestoreEvent,
   deleteEvent as deleteFirestoreEvent,
   getEventById as getFirestoreEventById,
   getEventBySlug as getFirestoreEventBySlug,
 } from "@/lib/firebase-service"
-import { useAuth } from "@/components/auth-provider"
+// import { useAuth } from "@/components/auth-provider"
 import { EventItem } from "@/types/event"
-import type { Timestamp } from "firebase/firestore"; // Import correct Timestamp type from Firebase
 
 // Create the context
 interface EventContextType {
@@ -33,7 +31,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<EventItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-  const { user } = useAuth()
+  // const { user } = useAuth()
 
   // Create a slug from the title
   const createSlug = (title: string) => {

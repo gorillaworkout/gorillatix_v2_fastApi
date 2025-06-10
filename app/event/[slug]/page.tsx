@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"; // required for dynamic routes that aren
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { notFound, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { CalendarDays, Clock, MapPin, Ticket, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
