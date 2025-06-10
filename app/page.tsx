@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
-import { EventCard } from "@/components/event-card"
-import { HeroSection } from "@/components/hero-section"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { useEvents } from "@/context/event-context"
+import { EventCard } from "@/components/event-card";
+import { HeroSection } from "@/components/hero-section";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useEvents } from "@/context/event-context";
+import { SkeletonCard } from "@/components/skeleton-card";
 
 export default function Home() {
   // Get events from context
-  const { events } = useEvents()
+  const { events, loading } = useEvents();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -23,18 +24,23 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {events.slice(0, 4).map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
+           {loading || !events
+            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            : events.slice(0, 4).map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
         </div>
       </section>
 
       <section className="py-12">
         <div className="rounded-lg bg-muted p-8 md:p-10">
           <div className="flex flex-col items-center space-y-4 text-center">
-            <h2 className="text-3xl font-bold tracking-tight">Organize Your Own Event</h2>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Organize Your Own Event
+            </h2>
             <p className="max-w-[700px] text-muted-foreground">
-              Are you an event organizer? Partner with GorillaTix to sell tickets for your events.
+              Are you an event organizer? Partner with GorillaTix to sell
+              tickets for your events.
             </p>
             <Button asChild size="lg">
               <Link href="/contact">Contact Us</Link>
@@ -43,5 +49,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -15,6 +15,7 @@ import { EventItem } from "@/types/event";
 import Head from "next/head";
 import LocationSection from "./../../../components/locatioSection";
 import { useRouter } from "next/navigation";
+import { ShareEventSection } from "@/components/share-event-section";
 
 export default function EventPage() {
   const params = useParams();
@@ -50,13 +51,12 @@ export default function EventPage() {
 
     fetchEvent();
   }, [params.slug, events, getEventBySlug]);
-  
+
   useEffect(() => {
     if (!loading && !event) {
       router.push("/");
     }
   }, [loading, event, router]);
-
 
   if (loading) {
     return (
@@ -137,7 +137,7 @@ export default function EventPage() {
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <MapPin className="mr-1 h-4 w-4" />
-                  <span>{event.location}</span>
+                  <span>{event.venue}</span>
                 </div>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function EventPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold mb-4">About This Event</h2>
-                <div className="prose max-w-none dark:prose-invert">
+                <div className="prose max-w-none dark:prose-invert prose whitespace-pre-line">
                   <p>{event.description}</p>
                 </div>
               </div>
@@ -195,8 +195,14 @@ export default function EventPage() {
                 <p className="text-muted-foreground mt-1">
                   {event.organizerDescription}
                 </p>
-                <Button variant="outline" className="mt-4">
-                  Contact Organizer
+                <Button variant="outline" className="mt-4" asChild>
+                  <Link
+                    href="https://www.instagram.com/cheerleadingindonesia/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Contact Organizer
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -251,37 +257,13 @@ export default function EventPage() {
               </div>
 
               <div className="rounded-lg border bg-card p-6 mt-6">
-                <h3 className="text-lg font-bold mb-4">Share This Event</h3>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full"
-                  >
-                    <span className="sr-only">Share on Facebook</span>F
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full"
-                  >
-                    <span className="sr-only">Share on Twitter</span>T
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full"
-                  >
-                    <span className="sr-only">Share on LinkedIn</span>L
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full"
-                  >
-                    <span className="sr-only">Share via Email</span>E
-                  </Button>
-                </div>
+                <ShareEventSection
+                  title={event.title}
+                  slug={event.slug}
+                  imageUrl={event.imageUrl}
+                  date={formatDate(event.date)}
+                  description={event.description}
+                />
               </div>
             </div>
           </div>
