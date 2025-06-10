@@ -11,23 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatRupiah } from "@/lib/utils";
+import { TicketViewerProps } from "@/types/tickets";
 
-interface TicketViewerProps {
+interface TicketViewProps {
   isOpen: boolean;
   onClose: () => void;
-  ticket: {
-    id: string;
-    eventName: string;
-    date: string;
-    time: string;
-    location: string;
-    quantity: number;
-    totalPrice: number;
-    status: string;
-  };
+  ticket: TicketViewerProps;
 }
 
-export function TicketViewer({ isOpen, onClose, ticket }: TicketViewerProps) {
+export function TicketViewer({ isOpen, onClose, ticket }: TicketViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -49,7 +41,7 @@ export function TicketViewer({ isOpen, onClose, ticket }: TicketViewerProps) {
             </div>
             <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
               <MapPin className="mr-1 h-4 w-4 text-background" />
-              <span className="text-background">{ticket.location}</span>
+              <span className="text-background">{ticket.venue}</span>
             </div>
           </div>
 
@@ -60,9 +52,9 @@ export function TicketViewer({ isOpen, onClose, ticket }: TicketViewerProps) {
               width={116}
               height={116}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-              onError={(e) => {
-                e.currentTarget.src = `https://api.qrserver.com/v1/create-qr-code/?size=116x116&data=${ticket.id}`;
-              }}
+              // onError={(e) => {
+              //   e.currentTarget.src = `https://api.qrserver.com/v1/create-qr-code/?size=116x116&data=${ticket.id}`;
+              // }}
             />
           </div>
 

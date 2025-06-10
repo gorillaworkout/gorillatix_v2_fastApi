@@ -4,7 +4,7 @@ import Link from "next/link"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Calendar, Ticket, Download, ExternalLink, AlertTriangle } from "lucide-react"
+import { Loader2, Calendar, Ticket, Download, ExternalLink, AlertTriangle, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -96,6 +96,7 @@ export default function OrdersPage() {
         date: event.date,
         time: event.time,
         location: event.location,
+        venue: event.venue,
         quantity: ticket.quantity,
         totalPrice: ticket.totalPrice,
         status: ticket.status,
@@ -117,6 +118,7 @@ export default function OrdersPage() {
       TIME: ${event.time}
       LOCATION: ${event.location}
       QUANTITY: ${ticket.quantity}
+      VENUE: ${event.venue}
       TOTAL PRICE: ${formatRupiah(ticket.totalPrice)}
       TICKET ID: ${ticket.id}
       STATUS: ${ticket.status}
@@ -195,7 +197,7 @@ export default function OrdersPage() {
                                 <Calendar className="mr-1 h-4 w-4" />
                                 {event.date} at {event.time}
                               </div>
-                              <div className="mt-1">{event.location}</div>
+                              <div className="mt-1"> <MapPin className="mr-1 h-4 w-4 text-background" /> {event.venue}</div>
                             </CardDescription>
                           </div>
                           <Badge>{ticket.status}</Badge>
@@ -262,7 +264,7 @@ export default function OrdersPage() {
                                 <Calendar className="mr-1 h-4 w-4" />
                                 {event.date} at {event.time}
                               </div>
-                              <div className="mt-1">{event.location}</div>
+                              <div className="mt-1"> <MapPin className="mr-1 h-4 w-4 text-background" />{event.venue}</div>
                             </CardDescription>
                           </div>
                           <Badge variant="outline">{ticket.status}</Badge>

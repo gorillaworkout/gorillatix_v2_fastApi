@@ -1,27 +1,26 @@
-import dynamic from "next/dynamic";
+"use client";
 
-const Map = dynamic(() => import("./Map"), { ssr: false });
+import { Map, Marker } from "pigeon-maps";
 
-type EventProps = {
+export default function LocationSection({
+  event,
+}: {
   event: {
     venue: string;
     address: string;
     latitude: number;
     longitude: number;
   };
-};
-
-export default function LocationSection({ event }: EventProps) {
+}) {
   return (
-    <div
-      className="mt-4 rounded-lg overflow-hidden bg-muted"
-      style={{ height: "300px" }}
-    >
+    <div className="w-full h-[300px] rounded-xl overflow-hidden">
       <Map
-        latitude={event.latitude}
-        longitude={event.longitude}
-        venue={event.venue}
-      />
+        height={300}
+        defaultCenter={[event.latitude, event.longitude]}
+        defaultZoom={15}
+      >
+        <Marker anchor={[event.latitude, event.longitude]} />
+      </Map>
     </div>
   );
 }

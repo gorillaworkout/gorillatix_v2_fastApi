@@ -281,7 +281,7 @@ export async function getTicketById(id: string) {
     }
   } catch (error) {
     console.error("Error getting ticket:", error)
-    throw error
+    return null // fallback to null instead of throwing
   }
 }
 
