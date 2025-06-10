@@ -22,6 +22,8 @@ export interface EventItem {
   userId?: string;
   status: "Active" | "upcoming" | "completed";
   ticketsSold: number;
+  startSellingDate: string;
+  endSellingDate: string;
 }
 
 export interface EventInput {

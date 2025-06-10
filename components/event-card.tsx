@@ -1,27 +1,34 @@
-import Link from "next/link"
-import Image from "next/image"
-import { CalendarDays, MapPin } from "lucide-react"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { formatDate, formatRupiah } from "@/lib/utils"
+import Link from "next/link";
+import Image from "next/image";
+import { CalendarDays, MapPin } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { formatDate, formatRupiah } from "@/lib/utils";
+import { EventItem } from "@/types/event";
 
 interface EventCardProps {
-  event: {
-    id: string
-    slug: string
-    title: string
-    date: string
-    location: string
-    imageUrl: string
-    price: number
-    category: string
-    ticketsAvailable: number
-  }
+  event: EventItem;
 }
 
 export function EventCard({ event }: EventCardProps) {
-  const { id, slug, title, date, location, imageUrl, price, category, ticketsAvailable } = event
+  const {
+    id,
+    slug,
+    title,
+    date,
+    location,
+    imageUrl,
+    venue,
+    price,
+    category,
+    ticketsAvailable,
+  } = event;
 
   return (
     <Card className="overflow-hidden">
@@ -48,7 +55,7 @@ export function EventCard({ event }: EventCardProps) {
         </div>
         <div className="flex items-center text-sm text-muted-foreground">
           <MapPin className="mr-1 h-4 w-4" />
-          <span className="truncate">{location}</span>
+          <span className="truncate">{venue}</span>
         </div>
         <div className="flex items-center justify-between mt-4">
           <div className="font-semibold">{formatRupiah(price)}</div>
@@ -64,10 +71,41 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button asChild className="w-full">
-          <Link href={`/event/${slug}`}>{ticketsAvailable > 0 ? "Buy Tickets" : "View Details"}</Link>
-        </Button>
+        {(() => {
+          const today = new Date();
+          const start = new Date(event.startSellingDate);
+          const end = new Date(event.endSellingDate);
+
+          // Set times to 00:00:00 to compare by day only
+          today.setHours(0, 0, 0, 0);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(0, 0, 0, 0);
+
+          if (today < start) {
+            return (
+              <Button disabled className="w-full cursor-not-allowed opacity-80">
+                Tickets will be sold on {formatDate(event.startSellingDate)}
+              </Button>
+            );
+          }
+
+          if (today > end) {
+            return (
+              <Button disabled className="w-full cursor-not-allowed opacity-80">
+                This event has ended
+              </Button>
+            );
+          }
+
+          return (
+            <Button asChild className="w-full">
+              <Link href={`/event/${slug}`}>
+                {ticketsAvailable > 0 ? "Buy Tickets" : "View Details"}
+              </Link>
+            </Button>
+          );
+        })()}
       </CardFooter>
     </Card>
-  )
+  );
 }

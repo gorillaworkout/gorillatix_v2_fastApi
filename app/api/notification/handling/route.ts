@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     const serverKey = process.env.MIDTRANS_SERVER_KEY || ""
 
-    const input = order_id + status_code + gross_amount + serverKey
+    const input = order_id + status_code + gross_amount.toString() + serverKey
     const expectedSignature = crypto.createHash("sha512").update(input).digest("hex")
 
     if (expectedSignature !== signature_key) {
