@@ -28,9 +28,9 @@ export default function AboutPage() {
               first. We've built GorillaTix to be transparent, user-friendly, and packed with events you'll love.
             </p>
           </div>
-          <div className="relative h-[400px] rounded-lg overflow-hidden">
+          <div className="relative h-[500px] rounded-lg overflow-hidden">
             <Image
-              src="/images/hero_gorillatix.webp"
+              src="/images/hero_gtx_2.webp"
               alt="GorillaTix team"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"

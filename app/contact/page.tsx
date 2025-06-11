@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState } from "react"
 
 export default function ContactPage() {
@@ -62,10 +63,9 @@ export default function ContactPage() {
               onChange={(e) => setMessage(e.target.value)}
             />
           </div>
-
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-2 px-4 rounded-lg"
+            className="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
           >
             Send via WhatsApp
           </button>
