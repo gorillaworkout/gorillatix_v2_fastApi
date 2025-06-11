@@ -175,6 +175,7 @@ export default function CheckoutClient({
             "customerName",
             `${values.firstName} ${values.lastName}`
           );
+          formData.append("venue", event.venue);
 
           try {
             const result = await processTicketPurchase(formData);
@@ -354,7 +355,7 @@ export default function CheckoutClient({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {[...Array(10).keys()].map((n) => (
+                          {[...Array(5).keys()].map((n) => (
                             <SelectItem key={n + 1} value={(n + 1).toString()}>
                               {n + 1}
                             </SelectItem>

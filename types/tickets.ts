@@ -8,4 +8,5 @@ export type TicketViewerProps = {
   quantity: number;
   totalPrice: number;
   status: string;
+  customerName: string;
 };

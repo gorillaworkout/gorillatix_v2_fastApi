@@ -186,7 +186,7 @@ export async function searchEvents(searchTerm: string) {
 }
 
 // Ticket Functions
-export async function purchaseTicket(eventId: string, quantity: number, price: number, userId: string, customerName: string) {
+export async function purchaseTicket(eventId: string, quantity: number, price: number, userId: string, customerName: string, venue: string) {
   try {
     // Validate inputs
     if (!eventId || !userId || quantity <= 0 || price <= 0) {
@@ -220,6 +220,7 @@ export async function purchaseTicket(eventId: string, quantity: number, price: n
         quantity,
         totalPrice: price * quantity,
         purchaseDate: Timestamp.now(),
+        venue,
         status: "confirmed",
         eventName: eventData.title,
         customerName: customerName

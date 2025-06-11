@@ -21,6 +21,8 @@ import { useAuth } from "@/components/auth-provider";
 import { TicketViewerProps } from "@/types/tickets";
 import { getEventById, getUserTickets } from "@/lib/firebase-service";
 import { formatRupiah } from "@/lib/utils";
+import html2canvas from "html2canvas";
+import HiddenTicketDownload from "@/components/hidden-ticket-download";
 
 // Mock data for tickets
 // const mockTickets = [
@@ -53,6 +55,7 @@ export default function ProfilePage() {
   const [ticketsLoading, setTicketsLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] =
     useState<TicketViewerProps | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [error, setError] = useState<string | null>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [ticketEvents, setTicketEvents] = useState<Record<string, any>>({});
@@ -118,44 +121,38 @@ export default function ProfilePage() {
   }, [loading, user, router]);
 
   const handleViewTicket = (
-    ticket: SetStateAction<TicketViewerProps | null>
+    ticket: SetStateAction<TicketViewerProps | null>, eventItem: any
   ) => {
     setSelectedTicket(ticket);
+    setSelectedEvent(eventItem)
     setIsTicketViewerOpen(true);
   };
 
-  const handleDownloadTicket = (ticket: {
-    id: any;
-    eventName: any;
-    date: any;
-    time: any;
-    location: any;
+  const handleDownloadTicket = async (ticket: {
+    eventId: string | number;
     quantity: any;
-    totalPrice: any;
+    totalPrice: number;
+    id: any;
     status: any;
   }) => {
-    // In a real app, this would generate a PDF using a library like jsPDF
-    // For demo purposes, we'll just create a text file
-    const ticketData = `
-      TICKET: ${ticket.eventName}
-      DATE: ${new Date(ticket.date).toLocaleDateString()}
-      TIME: ${ticket.time}
-      LOCATION: ${ticket.location}
-      QUANTITY: ${ticket.quantity}
-      TOTAL PRICE: $${ticket.totalPrice.toFixed(2)}
-      TICKET ID: ${ticket.id}
-      STATUS: ${ticket.status}
-    `;
+    console.log("handleDownloadTicket, on profile my ticket");
+    const event = ticketEvents[ticket.eventId];
+    if (!event) return;
 
-    const blob = new Blob([ticketData], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+    const ticketElement = document.getElementById(
+      `ticket-download-${ticket.id}`
+    );
+    if (!ticketElement) return;
+
+    const canvas = await html2canvas(ticketElement);
+    const image = canvas.toDataURL("image/png");
+
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `ticket-${ticket.id}.txt`;
+    a.href = image;
+    a.download = `ticket-${ticket.id}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   // Separate tickets into upcoming and past
@@ -172,7 +169,7 @@ export default function ProfilePage() {
     const eventDate = new Date(event.date);
     return eventDate < today;
   });
-  console.log(upcomingTickets, 'upcoming tickets');
+  console.log(upcomingTickets, "upcoming tickets");
   if (loading) {
     return (
       <div className="container flex h-screen items-center justify-center">
@@ -293,9 +290,9 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              {/* <CardFooter>
                 <Button variant="outline">Edit Profile</Button>
-              </CardFooter>
+              </CardFooter> */}
             </Card>
 
             <Card>
@@ -314,43 +311,58 @@ export default function ProfilePage() {
                   <TabsContent value="upcoming">
                     {upcomingTickets.length > 0 ? (
                       <div className="space-y-4">
-                        {upcomingTickets.map((ticket) => (
-                          <div
-                            key={ticket.id}
-                            className="flex items-center justify-between rounded-lg border p-4"
-                          >
-                            <div>
-                              <h3 className="font-medium">
-                                {ticket.eventName}
-                              </h3>
-                              <div className="flex items-center text-sm text-muted-foreground">
-                                <Calendar className="mr-1 h-4 w-4" />
-                                {new Date(ticket.date).toLocaleDateString()}
-
-                              </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                {ticket.quantity}{" "}
-                                {ticket.quantity === 1 ? "ticket" : "tickets"} •
-                                {formatRupiah(ticket.totalPrice)}
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDownloadTicket(ticket)}
+                        {upcomingTickets.map((ticket) => {
+                          console.log(ticket, 'upcoming profile ticket')
+                          const eventItem = ticketEvents[ticket.eventId];
+                          if (!eventItem) return null;
+                          return (
+                            <>
+                              <div
+                                key={ticket.id}
+                                className="flex items-center justify-between rounded-lg border p-4"
                               >
-                                Download
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => handleViewTicket(ticket)}
-                              >
-                                View Ticket
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
+                                <div>
+                                  <h3 className="font-medium">
+                                    {ticket.eventName}
+                                  </h3>
+                                  <div className="flex items-center text-sm text-muted-foreground">
+                                    <Calendar className="mr-1 h-4 w-4" />
+                                     {eventItem.date} at {eventItem.time}
+                                    
+                                  </div>
+                                  <div className="text-sm text-muted-foreground mt-1">
+                                    {ticket.quantity}{" "}
+                                    {ticket.quantity === 1
+                                      ? "ticket"
+                                      : "tickets"}{" "}
+                                    •{formatRupiah(ticket.totalPrice)}
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleDownloadTicket(ticket)}
+                                  >
+                                    Download
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleViewTicket(ticket, eventItem)
+                                      
+                                    }
+                                  >
+                                    View Ticket
+                                  </Button>
+                                </div>
+                                <HiddenTicketDownload
+                                  ticket={ticket}
+                                  event={eventItem}
+                                />
+                              </div>
+                            </>
+                          );
+                        })}
                       </div>
                     ) : (
                       <div className="text-center py-8">
@@ -369,44 +381,52 @@ export default function ProfilePage() {
                     {pastTickets.length > 0 ? (
                       <div className="space-y-4">
                         {pastTickets.map((ticket) => {
-                          console.log(ticket, 'ticket');
-                          const event = ticketEvents[ticket.eventId];
-                          if (!event) return null;
+                          console.log(ticket, "ticket");
+                          const eventItem = ticketEvents[ticket.eventId];
+                          if (!eventItem) return null;
                           return (
-                            <div
-                              key={ticket.id}
-                              className="flex items-center justify-between rounded-lg border p-4"
-                            >
-                              <div>
-                                <h3 className="font-medium">
-                                  {event.title}
-                                </h3>
-                                <div className="flex items-center text-sm text-muted-foreground">
-                                  <Calendar className="mr-1 h-4 w-4" />
-                                  {event.date} at {event.time}
+                            <>
+                              <div
+                                key={ticket.id}
+                                className="flex items-center justify-between rounded-lg border p-4"
+                              >
+                                <div>
+                                  <h3 className="font-medium">
+                                    {eventItem.title}
+                                  </h3>
+                                  <div className="flex items-center text-sm text-muted-foreground">
+                                    <Calendar className="mr-1 h-4 w-4" />
+                                    {eventItem.date} at {eventItem.time}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground mt-1">
+                                    {ticket.quantity}{" "}
+                                    {ticket.quantity === 1
+                                      ? "ticket"
+                                      : "tickets"}{" "}
+                                    • ${ticket.totalPrice.toFixed(2)}
+                                  </div>
                                 </div>
-                                <div className="text-sm text-muted-foreground mt-1">
-                                  {ticket.quantity}{" "}
-                                  {ticket.quantity === 1 ? "ticket" : "tickets"}{" "}
-                                  • ${ticket.totalPrice.toFixed(2)}
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleDownloadTicket(ticket)}
+                                  >
+                                    Download
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleViewTicket(ticket, eventItem)}
+                                  >
+                                    View Ticket
+                                  </Button>
                                 </div>
+                                <HiddenTicketDownload
+                                  ticket={ticket}
+                                  event={eventItem}
+                                />
                               </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleDownloadTicket(ticket)}
-                                >
-                                  Download
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleViewTicket(ticket)}
-                                >
-                                  View Ticket
-                                </Button>
-                              </div>
-                            </div>
+                            </>
                           );
                         })}
                       </div>
@@ -442,6 +462,7 @@ export default function ProfilePage() {
           isOpen={isTicketViewerOpen}
           onClose={() => setIsTicketViewerOpen(false)}
           ticket={selectedTicket}
+          event={selectedEvent}
         />
       )}
     </div>

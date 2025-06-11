@@ -69,6 +69,7 @@ export interface TicketProps {
   eventId: string
   userId: string
   quantity: number
+  venue: string
   totalPrice: number
   purchaseDate: Timestamp
   status: "confirmed" | "cancelled" | "used"

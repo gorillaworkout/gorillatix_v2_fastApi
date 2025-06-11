@@ -9,6 +9,7 @@ export async function processTicketPurchase(formData: FormData) {
     const price = Number.parseFloat(formData.get("price") as string)
     const userId = formData.get("userId") as string
     const customerName = formData.get("customerName") as string
+    const venue = formData.get("venue") as string
 
     console.log("Processing ticket purchase:", { eventId, quantity, price, userId })
 
@@ -32,7 +33,7 @@ export async function processTicketPurchase(formData: FormData) {
 
     // Purchase ticket
     console.log("Purchasing ticket with userId:", userId)
-    const ticket = await purchaseTicket(eventId, quantity, price, userId, customerName)
+    const ticket = await purchaseTicket(eventId, quantity, price, userId, customerName, venue)
 
     if (ticket) {
       console.log("Ticket purchased successfully:", ticket)
