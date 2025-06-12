@@ -10,7 +10,20 @@ import { SkeletonCard } from "@/components/skeleton-card";
 export default function Home() {
   // Get events from context
   const { events, loading } = useEvents();
-
+  const sortedEvents = events
+    ? [...events]
+        .filter((event) => {
+          const sellingStart = new Date(event.startSellingDate + "T00:00:00");
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return sellingStart >= today;
+        })
+        .sort((a, b) => {
+          const startA = new Date(a.startSellingDate + "T00:00:00");
+          const startB = new Date(b.startSellingDate + "T00:00:00");
+          return startA.getTime() - startB.getTime();
+        })
+    : [];
   return (
     <div className="container mx-auto px-4 py-8">
       <HeroSection />
@@ -24,11 +37,11 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-           {loading || !events
+          {loading || !events
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-            : events.slice(0, 4).map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+            : sortedEvents
+                .slice(0, 4)
+                .map((event) => <EventCard key={event.id} event={event} />)}
         </div>
       </section>
 

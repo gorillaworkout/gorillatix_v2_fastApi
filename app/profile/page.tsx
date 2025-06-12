@@ -121,10 +121,11 @@ export default function ProfilePage() {
   }, [loading, user, router]);
 
   const handleViewTicket = (
-    ticket: SetStateAction<TicketViewerProps | null>, eventItem: any
+    ticket: SetStateAction<TicketViewerProps | null>,
+    eventItem: any
   ) => {
     setSelectedTicket(ticket);
-    setSelectedEvent(eventItem)
+    setSelectedEvent(eventItem);
     setIsTicketViewerOpen(true);
   };
 
@@ -312,55 +313,50 @@ export default function ProfilePage() {
                     {upcomingTickets.length > 0 ? (
                       <div className="space-y-4">
                         {upcomingTickets.map((ticket) => {
-                          console.log(ticket, 'upcoming profile ticket')
+                          console.log(ticket, "upcoming profile ticket");
                           const eventItem = ticketEvents[ticket.eventId];
                           if (!eventItem) return null;
                           return (
-                            <>
-                              <div
-                                key={ticket.id}
-                                className="flex items-center justify-between rounded-lg border p-4"
-                              >
-                                <div>
-                                  <h3 className="font-medium">
-                                    {ticket.eventName}
-                                  </h3>
-                                  <div className="flex items-center text-sm text-muted-foreground">
-                                    <Calendar className="mr-1 h-4 w-4" />
-                                     {eventItem.date} at {eventItem.time}
-                                    
-                                  </div>
-                                  <div className="text-sm text-muted-foreground mt-1">
-                                    {ticket.quantity}{" "}
-                                    {ticket.quantity === 1
-                                      ? "ticket"
-                                      : "tickets"}{" "}
-                                    •{formatRupiah(ticket.totalPrice)}
-                                  </div>
+                            <div
+                              key={ticket.id}
+                              className="flex items-center justify-between rounded-lg border p-4"
+                            >
+                              <div>
+                                <h3 className="font-medium">
+                                  {ticket.eventName}
+                                </h3>
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <Calendar className="mr-1 h-4 w-4" />
+                                  {eventItem.date} at {eventItem.time}
                                 </div>
-                                <div className="flex gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleDownloadTicket(ticket)}
-                                  >
-                                    Download
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleViewTicket(ticket, eventItem)
-                                      
-                                    }
-                                  >
-                                    View Ticket
-                                  </Button>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {ticket.quantity}{" "}
+                                  {ticket.quantity === 1 ? "ticket" : "tickets"}{" "}
+                                  •{formatRupiah(ticket.totalPrice)}
                                 </div>
-                                <HiddenTicketDownload
-                                  ticket={ticket}
-                                  event={eventItem}
-                                />
                               </div>
-                            </>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleDownloadTicket(ticket)}
+                                >
+                                  Download
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleViewTicket(ticket, eventItem)
+                                  }
+                                >
+                                  View Ticket
+                                </Button>
+                              </div>
+                              <HiddenTicketDownload
+                                ticket={ticket}
+                                event={eventItem}
+                              />
+                            </div>
                           );
                         })}
                       </div>
@@ -385,48 +381,46 @@ export default function ProfilePage() {
                           const eventItem = ticketEvents[ticket.eventId];
                           if (!eventItem) return null;
                           return (
-                            <>
-                              <div
-                                key={ticket.id}
-                                className="flex items-center justify-between rounded-lg border p-4"
-                              >
-                                <div>
-                                  <h3 className="font-medium">
-                                    {eventItem.title}
-                                  </h3>
-                                  <div className="flex items-center text-sm text-muted-foreground">
-                                    <Calendar className="mr-1 h-4 w-4" />
-                                    {eventItem.date} at {eventItem.time}
-                                  </div>
-                                  <div className="text-sm text-muted-foreground mt-1">
-                                    {ticket.quantity}{" "}
-                                    {ticket.quantity === 1
-                                      ? "ticket"
-                                      : "tickets"}{" "}
-                                    • ${ticket.totalPrice.toFixed(2)}
-                                  </div>
+                            <div
+                              key={ticket.id}
+                              className="flex items-center justify-between rounded-lg border p-4"
+                            >
+                              <div>
+                                <h3 className="font-medium">
+                                  {eventItem.title}
+                                </h3>
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <Calendar className="mr-1 h-4 w-4" />
+                                  {eventItem.date} at {eventItem.time}
                                 </div>
-                                <div className="flex gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleDownloadTicket(ticket)}
-                                  >
-                                    Download
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleViewTicket(ticket, eventItem)}
-                                  >
-                                    View Ticket
-                                  </Button>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {ticket.quantity}{" "}
+                                  {ticket.quantity === 1 ? "ticket" : "tickets"}{" "}
+                                  • ${ticket.totalPrice.toFixed(2)}
                                 </div>
-                                <HiddenTicketDownload
-                                  ticket={ticket}
-                                  event={eventItem}
-                                />
                               </div>
-                            </>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleDownloadTicket(ticket)}
+                                >
+                                  Download
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleViewTicket(ticket, eventItem)
+                                  }
+                                >
+                                  View Ticket
+                                </Button>
+                              </div>
+                              <HiddenTicketDownload
+                                ticket={ticket}
+                                event={eventItem}
+                              />
+                            </div>
                           );
                         })}
                       </div>
