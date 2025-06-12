@@ -135,7 +135,7 @@ export default function CheckoutClient({
   const quantity = Number.parseInt(form.watch("quantity") || "1");
   const subtotal = event && event.price ? event.price * quantity : 0;
   const fees = Math.ceil(subtotal * 0.02);
-  const serviceCharge = 5000
+  const serviceCharge = 500
   const total = subtotal + fees + serviceCharge;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

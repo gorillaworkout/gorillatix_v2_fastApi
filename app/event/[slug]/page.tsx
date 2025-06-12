@@ -23,7 +23,7 @@ export default function EventPage() {
   const [event, setEvent] = useState<EventItem | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
+  const [imageLoaded, setImageLoaded] = useState(false);
   useEffect(() => {
     async function fetchEvent() {
       if (params.slug) {
@@ -143,7 +143,28 @@ export default function EventPage() {
             </div>
 
             <div className="rounded-lg overflow-hidden mb-8">
-              <div className="relative w-full aspect-video">
+               <div className="relative w-full aspect-video">
+                {/* Skeleton Loader */}
+                {!imageLoaded && (
+                  <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg" />
+                )}
+
+                {/* Actual Image */}
+                <Image
+                  src={
+                    event.imageUrl || `/favicon-96x96.png?height=400&width=800`
+                  }
+                  alt={event.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 800px"
+                  className={`object-cover transition-opacity duration-500 ${
+                    imageLoaded ? "opacity-100" : "opacity-0"
+                  }`}
+                  onLoad={() => setImageLoaded(true)}
+                  priority
+                />
+              </div>
+              {/* <div className="relative w-full aspect-video">
                 <Image
                   src={
                     event.imageUrl || `/favicon-96x96.png?height=400&width=800`
@@ -154,7 +175,7 @@ export default function EventPage() {
                   className="object-cover"
                   priority
                 />
-              </div>
+              </div> */}
             </div>
 
             <div className="space-y-6">

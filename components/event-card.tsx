@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatRupiah } from "@/lib/utils";
 import { EventItem } from "@/types/event";
-import { useEffect, useState } from "react";
 
 interface EventCardProps {
   event: EventItem;
@@ -30,7 +29,6 @@ export function EventCard({ event }: EventCardProps) {
     startSellingDate,
     endSellingDate,
   } = event;
-
   const today = new Date();
   const start = new Date(startSellingDate);
   const end = new Date(endSellingDate);

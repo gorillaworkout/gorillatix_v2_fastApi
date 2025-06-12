@@ -6,24 +6,56 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEvents } from "@/context/event-context";
 import { SkeletonCard } from "@/components/skeleton-card";
+import { useEffect } from "react";
 
 export default function Home() {
   // Get events from context
   const { events, loading } = useEvents();
-  const sortedEvents = events
-    ? [...events]
-        .filter((event) => {
-          const sellingStart = new Date(event.startSellingDate + "T00:00:00");
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          return sellingStart >= today;
-        })
-        .sort((a, b) => {
-          const startA = new Date(a.startSellingDate + "T00:00:00");
-          const startB = new Date(b.startSellingDate + "T00:00:00");
-          return startA.getTime() - startB.getTime();
-        })
-    : [];
+const sortedEvents = events
+  ? (() => {
+      const now = new Date();
+
+      const activeEvents = [];
+      const upcomingEvents = [];
+
+      for (const event of events) {
+        const sellingStart = new Date(
+          typeof event.startSellingDate === "string"
+            ? event.startSellingDate + "T00:00:00"
+            : event.startSellingDate
+        );
+
+        const eventDate = new Date(
+          typeof event.date === "string"
+            ? event.date + "T23:59:59"
+            : event.date
+        );
+
+        if (sellingStart <= now && eventDate >= now) {
+          activeEvents.push(event);
+        } else if (sellingStart > now) {
+          upcomingEvents.push(event);
+        }
+      }
+
+      // Sort active events by startSellingDate ascending (optional)
+      activeEvents.sort((a, b) => new Date(a.startSellingDate).getTime() - new Date(b.startSellingDate).getTime());
+
+      // Sort upcoming events by startSellingDate ascending
+      upcomingEvents.sort((a, b) => new Date(a.startSellingDate).getTime() - new Date(b.startSellingDate).getTime());
+
+      return [...activeEvents, ...upcomingEvents];
+    })()
+  : [];
+
+
+  useEffect(() => {
+    console.log(events, "events");
+  }, [events]);
+  useEffect(() => {
+    console.log(sortedEvents, "sortedEvents");
+  }, [sortedEvents]);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <HeroSection />

@@ -189,18 +189,18 @@ import { Button } from "@/components/ui/button";
 import { EventItem } from "@/types/event";
 import { SkeletonCard } from "@/components/skeleton-card";
 
-function EventsLoading() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-center w-full py-12">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p>Searching events...</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+// function EventsLoading() {
+//   return (
+//     <div className="space-y-6">
+//       <div className="flex items-center justify-center w-full py-12">
+//         <div className="flex flex-col items-center gap-2">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+//           <p>Searching events...</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 export default function EventsPage() {
   const searchParams = useSearchParams();
