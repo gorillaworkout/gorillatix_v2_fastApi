@@ -47,7 +47,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     try {
       const fetchedEvents = await getFirestoreEvents()
-      console.log(fetchedEvents, 'fetched events')
 
       if (fetchedEvents && fetchedEvents.length > 0) {
         // Ensure all events have slugs

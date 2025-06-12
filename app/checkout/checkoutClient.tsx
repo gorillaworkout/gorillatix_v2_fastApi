@@ -147,7 +147,7 @@ export default function CheckoutClient({
       const transactionPayload = {
         firstName: values.firstName,
         lastName: values.lastName,
-        email: values.email,
+        email: values.email, 
         phone: values.phone,
         quantity: parseInt(values.quantity),
         price: total,
