@@ -18,6 +18,7 @@ import { db, auth } from "./firebase"
 // import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 import { EventItem, FirestoreEvent, Order, OrderInput, TicketProps } from "@/types/event"
+import { StatusTicketProps } from "@/types/tickets"
 
 
 // Events Collection
@@ -186,34 +187,99 @@ export async function searchEvents(searchTerm: string) {
 }
 
 // Ticket Functions
-export async function purchaseTicket(eventId: string, quantity: number, price: number, userId: string, customerName: string, venue: string) {
+// export async function purchaseTicket(eventId: string, quantity: number, price: number, userId: string, customerName: string, venue: string, status: StatusTicketProps) {
+//   try {
+//     // Validate inputs
+//     if (!eventId || !userId || quantity <= 0 || price <= 0) {
+//       console.error("Invalid ticket purchase parameters:", { eventId, userId, quantity, price })
+//       throw new Error("Invalid ticket purchase parameters")
+//     }
+
+//     console.log("Creating ticket with userId:", userId)
+
+//     // Use a transaction to ensure consistency
+//     return await runTransaction(db, async (transaction) => {
+//       // Get the event
+//       const eventRef = doc(db, "events", eventId)
+//       const eventDoc = await transaction.get(eventRef)
+
+//       if (!eventDoc.exists()) {
+//         throw new Error("Event not found")
+//       }
+
+//       const eventData = eventDoc.data()
+
+//       // Check if enough tickets are available
+//       if (eventData.ticketsAvailable < quantity) {
+//         throw new Error(`Not enough tickets available. Only ${eventData.ticketsAvailable} left.`)
+//       }
+
+//       // Create the ticket
+//       const ticketData: Omit<TicketProps, "id"> = {
+//         eventId,
+//         userId,
+//         quantity,
+//         totalPrice: price * quantity,
+//         purchaseDate: Timestamp.now(),
+//         venue,
+//         status: status,
+//         eventName: eventData.title,
+//         customerName: customerName
+//       }
+
+//       // Update the event's available tickets
+//       const newTicketsAvailable = Math.max(0, eventData.ticketsAvailable - quantity)
+//       let ticketSold = `${Number(eventData.ticketsSold) + quantity}`
+//       console.log(ticketSold, 'ticket sold', Number(eventData.ticketsSold),'=>', quantity);
+//       transaction.update(eventRef, {
+//         ticketsAvailable: newTicketsAvailable,
+//         updatedAt: serverTimestamp(),
+//         ticketsSold: `${ticketSold}`,
+//       })
+
+//       // Add the ticket
+//       const ticketRef = doc(collection(db, "tickets"))
+//       transaction.set(ticketRef, ticketData)
+
+//       console.log("Ticket created with ID:", ticketRef.id)
+
+//       // Return the ticket with its ID
+//       return {
+//         id: ticketRef.id,
+//         ...ticketData,
+//       }
+//     })
+//   } catch (error) {
+//     console.error("Error purchasing ticket:", error)
+//     throw error
+//   }
+// }
+export async function purchaseTicket(
+  eventId: string,
+  quantity: number,
+  price: number,
+  userId: string,
+  customerName: string,
+  venue: string,
+  status: StatusTicketProps
+) {
   try {
-    // Validate inputs
     if (!eventId || !userId || quantity <= 0 || price <= 0) {
-      console.error("Invalid ticket purchase parameters:", { eventId, userId, quantity, price })
-      throw new Error("Invalid ticket purchase parameters")
+      throw new Error("Invalid ticket purchase parameters");
     }
 
-    console.log("Creating ticket with userId:", userId)
-
-    // Use a transaction to ensure consistency
     return await runTransaction(db, async (transaction) => {
-      // Get the event
-      const eventRef = doc(db, "events", eventId)
-      const eventDoc = await transaction.get(eventRef)
+      const eventRef = doc(db, "events", eventId);
+      const eventDoc = await transaction.get(eventRef);
 
-      if (!eventDoc.exists()) {
-        throw new Error("Event not found")
-      }
+      if (!eventDoc.exists()) throw new Error("Event not found");
 
-      const eventData = eventDoc.data()
+      const eventData = eventDoc.data();
 
-      // Check if enough tickets are available
       if (eventData.ticketsAvailable < quantity) {
-        throw new Error(`Not enough tickets available. Only ${eventData.ticketsAvailable} left.`)
+        throw new Error(`Only ${eventData.ticketsAvailable} tickets left.`);
       }
 
-      // Create the ticket
       const ticketData: Omit<TicketProps, "id"> = {
         eventId,
         userId,
@@ -221,38 +287,31 @@ export async function purchaseTicket(eventId: string, quantity: number, price: n
         totalPrice: price * quantity,
         purchaseDate: Timestamp.now(),
         venue,
-        status: "confirmed",
+        status,
         eventName: eventData.title,
-        customerName: customerName
-      }
+        customerName,
+      };
 
-      // Update the event's available tickets
-      const newTicketsAvailable = Math.max(0, eventData.ticketsAvailable - quantity)
-      let ticketSold = `${Number(eventData.ticketsSold) + quantity}`
-      console.log(ticketSold, 'ticket sold', Number(eventData.ticketsSold),'=>', quantity);
+      const newTicketsAvailable = Math.max(0, eventData.ticketsAvailable - quantity);
+      const ticketSold = `${Number(eventData.ticketsSold) + quantity}`;
+
       transaction.update(eventRef, {
         ticketsAvailable: newTicketsAvailable,
+        ticketsSold: ticketSold,
         updatedAt: serverTimestamp(),
-        ticketsSold: `${ticketSold}`,
-      })
+      });
 
-      // Add the ticket
-      const ticketRef = doc(collection(db, "tickets"))
-      transaction.set(ticketRef, ticketData)
+      const ticketRef = doc(collection(db, "tickets"));
+      transaction.set(ticketRef, ticketData);
 
-      console.log("Ticket created with ID:", ticketRef.id)
-
-      // Return the ticket with its ID
-      return {
-        id: ticketRef.id,
-        ...ticketData,
-      }
-    })
+      return { id: ticketRef.id, ...ticketData };
+    });
   } catch (error) {
-    console.error("Error purchasing ticket:", error)
-    throw error
+    console.error("Error purchasing ticket:", error);
+    throw error;
   }
 }
+
 
 export async function getUserTickets(userId: string) {
   try {
@@ -286,7 +345,7 @@ export async function getTicketById(id: string) {
   }
 }
 
-export async function updateTicketStatus(id: string, status: "confirmed" | "cancelled" | "used") {
+export async function updateTicketStatus(id: string, status: StatusTicketProps) {
   try {
     const docRef = doc(ticketsCollection, id)
     await updateDoc(docRef, { status })

@@ -10,3 +10,5 @@ export type TicketViewerProps = {
   status: string;
   customerName: string;
 };
+
+export type StatusTicketProps = "confirmed" | "cancelled" | "used" | "Pending" | "Error"

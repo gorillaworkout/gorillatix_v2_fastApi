@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase/firestore";
+import { StatusTicketProps } from "./tickets";
 
 // Event types
 export interface EventItem {
@@ -72,7 +73,7 @@ export interface TicketProps {
   venue: string
   totalPrice: number
   purchaseDate: Timestamp
-  status: "confirmed" | "cancelled" | "used"
+  status: StatusTicketProps
   eventName: string
   customerName: string
 }
