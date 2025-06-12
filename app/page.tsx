@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEvents } from "@/context/event-context";
 import { SkeletonCard } from "@/components/skeleton-card";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 export default function Home() {
   // Get events from context
@@ -49,12 +49,12 @@ const sortedEvents = events
   : [];
 
 
-  useEffect(() => {
-    console.log(events, "events");
-  }, [events]);
-  useEffect(() => {
-    console.log(sortedEvents, "sortedEvents");
-  }, [sortedEvents]);
+  // useEffect(() => {
+  //   console.log(events, "events");
+  // }, [events]);
+  // useEffect(() => {
+  //   console.log(sortedEvents, "sortedEvents");
+  // }, [sortedEvents]);
 
   return (
     <div className="container mx-auto px-4 py-8">
