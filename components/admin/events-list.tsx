@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { CalendarDays, Edit, MoreHorizontal, Trash } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import {
+  CalendarDays,
+  Edit,
+  MoreHorizontal,
+  Trash,
+  Download,
+} from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +19,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,26 +37,65 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { formatDate } from "@/lib/utils"
-import { useEvents } from "@/context/event-context"
+} from "@/components/ui/alert-dialog";
+import { formatDate, formatRupiah } from "@/lib/utils";
+import { useEvents } from "@/context/event-context";
+import { getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase"; // adjust this to your path
+import { exportToExcelWithTitle } from "@/scripts/excel";
+// import { exportToExcel } from "@/scripts/excel";
 
 export function AdminEventsList() {
-  const { events, deleteEvent } = useEvents()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
-  console.log(events, 'events');
+  const { events, deleteEvent } = useEvents();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  console.log(events, "events");
   const handleDelete = (id: string) => {
-    setSelectedEventId(id)
-    setDeleteDialogOpen(true)
-  }
+    setSelectedEventId(id);
+    setDeleteDialogOpen(true);
+  };
 
   const confirmDelete = () => {
     if (selectedEventId) {
-      deleteEvent(selectedEventId)
+      deleteEvent(selectedEventId);
     }
-    setDeleteDialogOpen(false)
+    setDeleteDialogOpen(false);
+  };
+
+const handleDownloadReport = async (eventId: string) => {
+  try {
+    const q = query(
+      collection(db, "tickets"),
+      where("eventId", "==", eventId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const tickets = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        "Customer Name": data.customerName,
+        "User ID": data.userId,
+        "Event Name": data.eventName,
+        "Purchase Date": data.purchaseDate.toDate().toLocaleString(),
+        "Quantity": data.quantity,
+        "Status": data.status,
+        "Total Price": formatRupiah(data.totalPrice),
+        "Venue": data.venue,
+      };
+    });
+
+    if (tickets.length === 0) {
+      alert("No tickets found for this event.");
+      return;
+    }
+
+    const title = `Ticket Report for ${tickets[0]["Event Name"]}`;
+    exportToExcelWithTitle(tickets, `tickets-${eventId}`, title);
+  } catch (error) {
+    console.error("Error exporting tickets:", error);
+    alert("Failed to download Excel. Check console for details.");
   }
+};
 
   return (
     <>
@@ -75,7 +127,9 @@ export function AdminEventsList() {
                 <Badge variant="outline">{event.category}</Badge>
               </TableCell>
               <TableCell>
-                <Badge variant={event.ticketsAvailable > 0 ? "default" : "secondary"}>
+                <Badge
+                  variant={event.ticketsAvailable > 0 ? "default" : "secondary"}
+                >
                   {event.ticketsAvailable > 0 ? "Active" : "Sold Out"}
                 </Badge>
               </TableCell>
@@ -92,6 +146,13 @@ export function AdminEventsList() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      // className="text-destructive focus:text-destructive"
+                      onClick={() => handleDownloadReport(event.id)}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href={`/admin/events/${event.id}`}>
                         <Edit className="mr-2 h-4 w-4" />
@@ -118,8 +179,8 @@ export function AdminEventsList() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the event and all associated tickets and
-              transactions.
+              This action cannot be undone. This will permanently delete the
+              event and all associated tickets and transactions.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -134,5 +195,5 @@ export function AdminEventsList() {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

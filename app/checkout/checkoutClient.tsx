@@ -127,8 +127,8 @@ export default function CheckoutClient({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      firstName: user?.displayName?.split(' ')[0] ||"",
+      lastName: user?.displayName?.split(' ')[1] ||"",
       email: user?.email || "",
       phone: "",
       quantity: "1",
@@ -359,7 +359,7 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="you@example.com" {...field} />
+                        <Input placeholder="you@example.com" {...field} disabled/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -372,7 +372,7 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="+1 (555) 123-4567" {...field} />
+                        <Input placeholder="+62 (877) 123-4567" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -48,14 +48,6 @@ const sortedEvents = events
     })()
   : [];
 
-
-  // useEffect(() => {
-  //   console.log(events, "events");
-  // }, [events]);
-  // useEffect(() => {
-  //   console.log(sortedEvents, "sortedEvents");
-  // }, [sortedEvents]);
-
   return (
     <div className="container mx-auto px-4 py-8">
       <HeroSection />
