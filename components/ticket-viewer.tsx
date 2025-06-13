@@ -32,26 +32,26 @@ export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps
           <DialogHeader>
             <DialogTitle>Ticket Details</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-              <X className="h-4 w-4 text-background" />
-              <span className="sr-only text-background">Close</span>
+              <X className="h-4 w-4 text-muted-foreground" />
+              <span className="sr-only text-muted-foreground">Close</span>
             </DialogClose>
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-center">
-              <h3 className="font-bold text-lg text-background">
+              <h3 className="font-bold text-lg text-muted-foreground">
                 {ticket.eventName}
               </h3>
               <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
-                <Calendar className="mr-1 h-4 w-4 text-background" />
-                <span className="text-background">
+                <Calendar className="mr-1 h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">
                   {event.date} at {event.time}
                 </span>
-                {/* <Clock className="ml-2 mr-1 h-4 w-4 text-background" /> */}
-                <span className="text-background">{ticket.time}</span>
+                {/* <Clock className="ml-2 mr-1 h-4 w-4 text-muted-foreground" /> */}
+                <span className="text-muted-foreground">{ticket.time}</span>
               </div>
               <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
-                <MapPin className="mr-1 h-4 w-4 text-background" />
-                <span className="text-background">{ticket.venue}</span>
+                <MapPin className="mr-1 h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{ticket.venue}</span>
               </div>
             </div>
 
@@ -72,26 +72,26 @@ export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <div className="font-medium text-background">Ticket ID</div>
-                <div className="text-background font-bold">{ticket.id}</div>
+                <div className="font-medium text-muted-foreground">Ticket ID</div>
+                <div className="text-muted-foreground font-bold">{ticket.id}</div>
               </div>
               <div>
-                <div className="font-medium text-background">Status</div>
-                <div className="text-background font-bold capitalize">
+                <div className="font-medium text-muted-foreground">Status</div>
+                <div className="text-muted-foreground font-bold capitalize">
                   {ticket.status}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-background">Quantity</div>
-                <div className="flex items-center text-background font-bold">
+                <div className="font-medium text-muted-foreground">Quantity</div>
+                <div className="flex items-center text-muted-foreground font-bold">
                   <Users className="mr-1 h-4 w-4" />
                   {ticket.quantity}{" "}
                   {ticket.quantity === 1 ? "ticket" : "tickets"}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-background">Total Price</div>
-                <div className="text-background font-bold">
+                <div className="font-medium text-muted-foreground">Total Price</div>
+                <div className="text-muted-foreground font-bold">
                   {formatRupiah(ticket.totalPrice)}
                 </div>
               </div>
