@@ -38,20 +38,20 @@ export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps
           </DialogHeader>
           <div className="space-y-4">
             <div className="text-center">
-              <h3 className="font-bold text-lg text-muted-foreground">
+              <h3 className="font-bold text-lg text-black">
                 {ticket.eventName}
               </h3>
               <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
-                <Calendar className="mr-1 h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">
+                <Calendar className="mr-1 h-4 w-4 text-black" />
+                <span className="text-black mr-2">
                   {event.date} at {event.time}
                 </span>
                 {/* <Clock className="ml-2 mr-1 h-4 w-4 text-muted-foreground" /> */}
-                <span className="text-muted-foreground">{ticket.time}</span>
+                <span className="text-black">{ticket.time}</span>
               </div>
               <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
-                <MapPin className="mr-1 h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{ticket.venue}</span>
+                <MapPin className="mr-1 h-4 w-4 text-black" />
+                <span className="text-black">{ticket.venue}</span>
               </div>
             </div>
 
@@ -72,17 +72,17 @@ export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <div className="font-medium text-muted-foreground">Ticket ID</div>
+                <div className="font-medium text-black">Ticket ID</div>
                 <div className="text-muted-foreground font-bold">{ticket.id}</div>
               </div>
               <div>
-                <div className="font-medium text-muted-foreground">Status</div>
+                <div className="font-medium text-black">Status</div>
                 <div className="text-muted-foreground font-bold capitalize">
                   {ticket.status}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-muted-foreground">Quantity</div>
+                <div className="font-medium text-black">Quantity</div>
                 <div className="flex items-center text-muted-foreground font-bold">
                   <Users className="mr-1 h-4 w-4" />
                   {ticket.quantity}{" "}
@@ -90,7 +90,7 @@ export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps
                 </div>
               </div>
               <div>
-                <div className="font-medium text-muted-foreground">Total Price</div>
+                <div className="font-medium text-black">Total Price</div>
                 <div className="text-muted-foreground font-bold">
                   {formatRupiah(ticket.totalPrice)}
                 </div>
