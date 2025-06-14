@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  const isProduction = process.env.MIDTRANS_ENV === "production";
 
   // Convert values to number safely
   const quantity = Number(body.quantity);
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
 
   const snap = new midtransClient.Snap({
-    isProduction: false,
+    isProduction: isProduction,
     serverKey: process.env.MIDTRANS_SERVER_KEY!,
   });
 
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     item_details: [
       {
         id: "TICKET",
-        name: "Event Ticket",
+        name: `Event Ticket - ${body.firstName} ${body.lastName}`,
         quantity: quantity,
         price: price, // ❗ Ensure this is a number
       },

@@ -359,7 +359,7 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="you@example.com" {...field} disabled/>
+                        <Input placeholder="you@example.com" {...field} disabled={field.value? true : false}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

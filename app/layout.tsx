@@ -8,7 +8,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { ClientProviders } from "@/components/client-providers"; // ✅ new wrapper
 
 const inter = Inter({ subsets: ["latin"] });
-const midtransClientKey = process.env.MIDTRANS_CLIENT_KEY;
 
 export const metadata: Metadata = {
   title: "Beli Tiket Online Murah & Aman | GorillaTix",
@@ -64,6 +63,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const midtransClientKey = process.env.MIDTRANS_CLIENT_KEY;
+  const midtransEnv = process.env.MIDTRANS_ENV || "sandbox";
+  console.log(midtransEnv, 'midtrans Env')
+  const snapJsUrl =
+  midtransEnv === "production"
+    ? "https://app.midtrans.com/snap/snap.js"
+    : "https://app.sandbox.midtrans.com/snap/snap.js";
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -73,7 +79,7 @@ export default function RootLayout({
         <meta name="twitter:image" content="https://www.gorillatix.com/favicon-96x96.png" />
         <script
           async
-          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          src={snapJsUrl}
           data-client-key={midtransClientKey}
         />
         <link rel="icon" type="image/png" href="/favicon-96x96.png" />
