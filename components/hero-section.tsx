@@ -8,15 +8,18 @@ export function HeroSection() {
   return (
     <>
       <Head>
+        {/* Preload optimized image for mobile */}
         <link
           rel="preload"
           as="image"
-          href="/_next/image?url=%2Fimages%2Fhero_logo_gtix.webp&w=1200&q=75"
+          href="/_next/image?url=%2Fimages%2Fhero_logo_gtix.webp&w=480&q=60"
         />
       </Head>
+
       <section className="py-12 md:py-16 lg:py-20">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+          <div className="flex flex-col-reverse lg:grid lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px] gap-6">
+            {/* TEXT SIDE */}
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
@@ -47,17 +50,20 @@ export function HeroSection() {
                 </Button>
               </div>
             </div>
+
+            {/* IMAGE SIDE */}
             <div className="flex items-center justify-center">
-              <div className="relative aspect-video overflow-hidden rounded-xl w-full h-full">
+              <div className="relative w-full aspect-video overflow-hidden rounded-xl">
                 <Image
                   src="/images/hero_logo_gtix.webp"
                   alt="Featured events"
-                  fill
+                  width={800} // Adjust width based on your layout needs
+                  height={450} // Maintain aspect ratio
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover w-full h-full rounded-xl"
+                  className="rounded-xl object-cover w-full h-full"
                   priority
                   placeholder="blur"
-                  blurDataURL="/images/hero_logo_gtix_placeholder.webp" // bikin versi 10px-an
+                  blurDataURL="/images/hero_logo_gtix_placeholder.webp"
                 />
               </div>
             </div>
