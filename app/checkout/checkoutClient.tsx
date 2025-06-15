@@ -127,8 +127,8 @@ export default function CheckoutClient({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: user?.displayName?.split(' ')[0] ||"",
-      lastName: user?.displayName?.split(' ')[1] ||"",
+      firstName: user?.displayName?.split(" ")[0] || "",
+      lastName: user?.displayName?.split(" ")[1] || "",
       email: user?.email || "",
       phone: "",
       quantity: "1",
@@ -141,152 +141,159 @@ export default function CheckoutClient({
   const serviceCharge = 500;
   const total = subtotal + fees + serviceCharge;
 
-async function onSubmit(values: z.infer<typeof formSchema>) {
-  if (!event || !user) return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!event || !user) return;
 
-  setIsLoading(true);
-  setError(null);
-  let didReserve = false;
+    setIsLoading(true);
+    setError(null);
+    let didReserve = false;
 
-  try {
-    await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
-    didReserve = true;
+    try {
+      await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
+      didReserve = true;
 
-    const transactionPayload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phone: values.phone,
-      quantity: parseInt(values.quantity),
-      price: total,
-    };
+      const transactionPayload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        quantity: parseInt(values.quantity),
+        price: total,
+      };
 
-    const response = await fetch("/api/transaction", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(transactionPayload),
-    });
+      const response = await fetch("/api/transaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(transactionPayload),
+      });
 
-    if (!response.ok) throw new Error("Failed to create transaction");
-    const data: { token: string } = await response.json();
+      if (!response.ok) throw new Error("Failed to create transaction");
+      const data: { token: string } = await response.json();
 
-    setIsLoadingPayment(true);
+      setIsLoadingPayment(true);
 
-    const snap = (window as any).snap;
+      const snap = (window as any).snap;
 
-    // 🧠 Bungkus snap.pay agar bisa diawait
-    await new Promise<void>((resolve) => {
-      snap?.pay(data.token, {
-        onSuccess: async () => {
-          const formData = new FormData();
-          formData.append("eventId", event.id);
-          formData.append("quantity", values.quantity);
-          formData.append("price", total.toString());
-          formData.append("userId", user.uid);
-          formData.append("customerName", `${values.firstName} ${values.lastName}`);
-          formData.append("venue", event.venue);
-          formData.append("status", "confirmed");
+      // 🧠 Bungkus snap.pay agar bisa diawait
+      await new Promise<void>((resolve) => {
+        snap?.pay(data.token, {
+          onSuccess: async () => {
+            const formData = new FormData();
+            formData.append("eventId", event.id);
+            formData.append("quantity", values.quantity);
+            formData.append("price", total.toString());
+            formData.append("userId", user.uid);
+            formData.append(
+              "customerName",
+              `${values.firstName} ${values.lastName}`
+            );
+            formData.append("venue", event.venue);
+            formData.append("status", "confirmed");
 
-          try {
-            const result = await processTicketPurchase(formData);
-            if (result.success) {
-              toast({
-                title: "Payment successful",
-                description: "You can view your ticket on My Ticket page.",
-              });
-              router.push(`/payment-success?ticketId=${result.ticketId}`);
-            } else {
-              setError(result.message || "Failed to save ticket after payment.");
+            try {
+              const result = await processTicketPurchase(formData);
+              if (result.success) {
+                toast({
+                  title: "Payment successful",
+                  description: "You can view your ticket on My Ticket page.",
+                });
+                router.push(`/payment-success?ticketId=${result.ticketId}`);
+              } else {
+                setError(
+                  result.message || "Failed to save ticket after payment."
+                );
+                toast({
+                  variant: "destructive",
+                  title: "Ticket Processing Failed",
+                  description: "Payment succeeded but ticket creation failed.",
+                });
+              }
+            } catch (err) {
+              console.error("Ticket error:", err);
               toast({
                 variant: "destructive",
-                title: "Ticket Processing Failed",
-                description: "Payment succeeded but ticket creation failed.",
+                title: "Ticket Save Error",
+                description: "Please contact support.",
               });
+            } finally {
+              resolve();
             }
-          } catch (err) {
-            console.error("Ticket error:", err);
+          },
+
+          onPending: async () => {
+            if (didReserve) {
+              await releaseTickets(event.id, parseInt(values.quantity));
+            }
+            toast({
+              title: "Payment pending",
+              description: "Please complete the payment from your bank app.",
+            });
+            resolve();
+          },
+
+          onError: async () => {
+            if (didReserve) {
+              await releaseTickets(event.id, parseInt(values.quantity));
+            }
             toast({
               variant: "destructive",
-              title: "Ticket Save Error",
-              description: "Please contact support.",
+              title: "Payment failed",
+              description: "An error occurred during payment.",
             });
-          } finally {
             resolve();
-          }
-        },
+          },
 
-        onPending: async () => {
-          if (didReserve) {
-            await releaseTickets(event.id, parseInt(values.quantity));
-          }
-          toast({
-            title: "Payment pending",
-            description: "Please complete the payment from your bank app.",
-          });
-          resolve();
-        },
-
-        onError: async () => {
-          if (didReserve) {
-            await releaseTickets(event.id, parseInt(values.quantity));
-          }
-          toast({
-            variant: "destructive",
-            title: "Payment failed",
-            description: "An error occurred during payment.",
-          });
-          resolve();
-        },
-
-        onClose: async () => {
-          if (didReserve) {
-            await releaseTickets(event.id, parseInt(values.quantity));
-          }
-          toast({
-            title: "Payment cancelled",
-            description: "You closed the payment popup. No ticket was created.",
-          });
-          resolve();
-        },
-      });
-    });
-
-  } catch (err) {
-    if (didReserve) {
-      await releaseTickets(event.id, parseInt(values.quantity));
-    }
-
-    if (err instanceof Error) {
-      if (err.message.includes("Tickets are sold out")) {
-        toast({
-          variant: "destructive",
-          title: "Tickets Unavailable",
-          description: "The tickets have been sold out or held by other users. Please try another event.",
+          onClose: async () => {
+            if (didReserve) {
+              await releaseTickets(event.id, parseInt(values.quantity));
+            }
+            toast({
+              title: "Payment cancelled",
+              description:
+                "You closed the payment popup. No ticket was created.",
+            });
+            resolve();
+          },
         });
-        router.push("/");
-        return;
+      });
+    } catch (err) {
+      if (didReserve) {
+        await releaseTickets(event.id, parseInt(values.quantity));
       }
 
-      toast({
-        variant: "destructive",
-        title: "Ticket Reservation Failed",
-        description: err.message || "An error occurred while reserving your tickets.",
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Ticket Reservation Failed",
-        description: "An unknown error occurred while reserving your tickets.",
-      });
-    }
-    return;
-  } finally {
-    // ✅ Always executed
-    setIsLoading(false);
-    setIsLoadingPayment(false);
-  }
-}
+      if (err instanceof Error) {
+        if (err.message.includes("Tickets are sold out")) {
+          toast({
+            variant: "destructive",
+            title: "Tickets Unavailable",
+            description:
+              "The tickets have been sold out or held by other users. Please try another event.",
+          });
+          router.push("/");
+          return;
+        }
 
+        toast({
+          variant: "destructive",
+          title: "Ticket Reservation Failed",
+          description:
+            err.message || "An error occurred while reserving your tickets.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Ticket Reservation Failed",
+          description:
+            "An unknown error occurred while reserving your tickets.",
+        });
+      }
+      return;
+    } finally {
+      // ✅ Always executed
+      setIsLoading(false);
+      setIsLoadingPayment(false);
+    }
+  }
 
   if (isLoadingPayment) return <Loader title="Preparing your tickets" />;
   if (authLoading || isLoadingEvent)
@@ -359,7 +366,11 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="you@example.com" {...field} disabled={field.value? true : false}/>
+                        <Input
+                          placeholder="you@example.com"
+                          {...field}
+                          disabled={field.value ? true : false}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -384,6 +395,10 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
 
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Ticket Information</h2>
+                <p className="text-sm text-muted-foreground">
+                  Anak di bawah 3 tahun{" "}
+                  <span className="font-semibold">gratis</span> tanpa tiket.
+                </p>
                 <FormField
                   control={form.control}
                   name="quantity"
