@@ -23,8 +23,6 @@ interface TicketViewProps {
 }
 
 export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps) {
-  console.log(ticket, 'ticket viewer');
-  // console.log(event, 'event ticket viewer')
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -114,7 +112,6 @@ export function TicketViewer({ isOpen, onClose, ticket, event }: TicketViewProps
 }
 
 const downloadTicket = async (ticket: any) => {
-  console.log("handleDownloadTicket, on profile my ticket");
 
   const ticketElement = document.getElementById(`ticket-download-${ticket.id}`);
   if (!ticketElement) return;
@@ -123,7 +120,6 @@ const downloadTicket = async (ticket: any) => {
   const image = canvas.toDataURL("image/png");
 
   const a = document.createElement("a");
-  console.log("download ticket as an image");
   a.href = image;
   a.download = `ticket-${ticket.id}.png`;
   document.body.appendChild(a);

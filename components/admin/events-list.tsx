@@ -49,7 +49,6 @@ export function AdminEventsList() {
   const { events, deleteEvent } = useEvents();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  console.log(events, "events");
   const handleDelete = (id: string) => {
     setSelectedEventId(id);
     setDeleteDialogOpen(true);

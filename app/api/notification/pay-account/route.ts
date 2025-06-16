@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Invalid signature" }, { status: 403 })
     }
 
-    console.log("✅ Pay Account Notification Received")
-    console.log("Order ID:", order_id)
-    console.log("Transaction Status:", transaction_status)
+    // console.log("✅ Pay Account Notification Received")
+    // console.log("Order ID:", order_id)
+    // console.log("Transaction Status:", transaction_status)
 
     // --- Update Firestore ---
     let newStatus = ""
@@ -51,12 +51,12 @@ export async function POST(req: NextRequest) {
         status: newStatus,
         updatedAt: new Date(),
       })
-      console.log(`✅ Ticket ${order_id} updated to ${newStatus}`)
+      // console.log(`✅ Ticket ${order_id} updated to ${newStatus}`)
     }
 
     return NextResponse.json({ message: "Pay Account notification handled" })
   } catch (error) {
-    console.error("🔥 Pay Account notification error:", error)
+    // console.error("🔥 Pay Account notification error:", error)
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
   }
 }

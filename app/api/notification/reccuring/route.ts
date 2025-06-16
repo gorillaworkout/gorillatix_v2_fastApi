@@ -27,22 +27,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const transactionStatus = body.transaction_status
     const subscriptionId = body.subscription_id
 
-    console.log("Recurring payment notification received")
-    console.log("Status:", transactionStatus)
-    console.log("Order ID:", order_id)
-    console.log("Subscription ID:", subscriptionId)
+    // console.log("Recurring payment notification received")
+    // console.log("Status:", transactionStatus)
+    // console.log("Order ID:", order_id)
+    // console.log("Subscription ID:", subscriptionId)
 
     // ✅ Handle status
     if (transactionStatus === "settlement" || transactionStatus === "capture") {
       // Subscription charged successfully
       // TODO: Update user subscription in database, extend period, etc
-      console.log('Subscription charged successfully reccuring.ts')
+      // console.log('Subscription charged successfully reccuring.ts')
     } else if (transactionStatus === "pending") {
       // Still pending
-      console.log('Subscription pending reccuring.ts')
+      // console.log('Subscription pending reccuring.ts')
     } else if (transactionStatus === "expire" || transactionStatus === "cancel") {
       // Subscription failed or cancelled
-      console.log('Subscription failed or cancelled reccuring.ts')
+      // console.log('Subscription failed or cancelled reccuring.ts')
     }
 
     return res.status(200).json({ message: "Recurring notification processed" })

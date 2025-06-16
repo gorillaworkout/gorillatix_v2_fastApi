@@ -1,7 +1,7 @@
 // lib/firebase-admin.ts
 import admin from 'firebase-admin'
 
-const serviceAccount = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string)
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string)
 
 if (!admin.apps.length) {
   admin.initializeApp({

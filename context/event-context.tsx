@@ -43,7 +43,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
   // Load events from Firestore on mount
   const fetchEvents = async () => {
-    console.log('fetch event is running')
     setLoading(true)
     try {
       const fetchedEvents = await getFirestoreEvents()
@@ -54,7 +53,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
           ...event,
           slug: event.slug || createSlug(event.title),
         }))
-        console.log(eventsWithSlugs, 'event with slugs')
         setEvents(eventsWithSlugs)
       } else {
         // Empty array if no events found
@@ -140,7 +138,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
   // Get an event by slug
   const getEventBySlug = async (slug: string) => {
-    console.log(slug, 'slug 143')
     try {
       // Check local state first
       const localEvent = events.find((event) => event.slug === slug)
@@ -148,14 +145,12 @@ export function EventProvider({ children }: { children: ReactNode }) {
 
       // If not found locally, fetch from Firestore
       const event = await getFirestoreEventBySlug(slug)
-      console.log(event, 'event 151 setelah get firestore')
       if (event) return event as EventItem
 
       // If still not found, refresh events and try again
       await refreshEvents()
       return events.find((event) => event.slug === slug) || null
     } catch (err) {
-      console.error("Error getting event by slug:", err)
       setError("Failed to get event")
       return null
     }

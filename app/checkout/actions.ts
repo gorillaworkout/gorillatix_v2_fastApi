@@ -10,7 +10,7 @@ export async function processTicketPurchase(formData: FormData) {
     const customerName = formData.get("customerName") as string
     const venue = formData.get("venue") as string
     const status = formData.get("status") as "confirmed" | "cancelled" | "used"
-    console.log("Processing ticket purchase:", { eventId, quantity, price, userId })
+    // console.log("Processing ticket purchase:", { eventId, quantity, price, userId })
 
     if (!eventId || isNaN(quantity) || isNaN(price)) {
       console.error("Invalid form data:", { eventId, quantity, price })
@@ -21,7 +21,7 @@ export async function processTicketPurchase(formData: FormData) {
     }
 
     if (!userId) {
-      console.error("User not authenticated")
+      // console.error("User not authenticated")
       return {
         success: false,
         message: "User not authenticated. Please log in and try again.",
@@ -31,11 +31,11 @@ export async function processTicketPurchase(formData: FormData) {
     // In a real app, you'd process payment here
 
     // Purchase ticket
-    console.log("Purchasing ticket with userId:", userId)
+    // console.log("Purchasing ticket with userId:", userId)
     const ticket = await purchaseTicket(eventId, quantity, price, userId, customerName, venue, status)
 
     if (ticket) {
-      console.log("Ticket purchased successfully:", ticket)
+      // console.log("Ticket purchased successfully:", ticket)
       return {
         success: true,
         message: "Ticket purchased successfully",

@@ -217,7 +217,6 @@ export default function EventsPage() {
   const eventsPerPage = 8;
 
   const filterEvents = useCallback(async () => {
-    console.log(events, 'events are here');
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));

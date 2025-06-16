@@ -81,7 +81,6 @@ export default function ProfilePage() {
           const sortedTickets = [...userTickets].sort((a, b) => {
             return b.purchaseDate.toMillis() - a.purchaseDate.toMillis();
           });
-          console.log(sortedTickets, "sorted tickets");
 
           setTickets(sortedTickets);
 
@@ -136,7 +135,6 @@ export default function ProfilePage() {
     id: any;
     status: any;
   }) => {
-    console.log("handleDownloadTicket, on profile my ticket");
     const event = ticketEvents[ticket.eventId];
     if (!event) return;
 
@@ -170,7 +168,6 @@ export default function ProfilePage() {
     const eventDate = new Date(event.date);
     return eventDate < today;
   });
-  console.log(upcomingTickets, "upcoming tickets");
   if (loading) {
     return (
       <div className="container flex h-screen items-center justify-center">
@@ -313,7 +310,6 @@ export default function ProfilePage() {
                     {upcomingTickets.length > 0 ? (
                       <div className="space-y-4">
                         {upcomingTickets.map((ticket) => {
-                          console.log(ticket, "upcoming profile ticket");
                           const eventItem = ticketEvents[ticket.eventId];
                           if (!eventItem) return null;
                           return (
@@ -377,7 +373,6 @@ export default function ProfilePage() {
                     {pastTickets.length > 0 ? (
                       <div className="space-y-4">
                         {pastTickets.map((ticket) => {
-                          console.log(ticket, "ticket");
                           const eventItem = ticketEvents[ticket.eventId];
                           if (!eventItem) return null;
                           return (

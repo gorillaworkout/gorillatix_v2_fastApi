@@ -74,7 +74,6 @@ export async function getEventById(id: string) {
   try {
     const docRef = doc(eventsCollection, id);
     const docSnap = await getDoc(docRef);
-
     if (docSnap.exists()) {
       return { id: docSnap.id, ...docSnap.data() } as EventItem;
     } else {
@@ -273,8 +272,6 @@ export async function purchaseTicket(
   status: StatusTicketProps
 ) {
   try {
-    console.log('purchase ticket is running', { eventId, userId, quantity, price });
-    
     if (
       !eventId ||
       !userId ||

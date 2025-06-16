@@ -5,18 +5,6 @@ import Head from "next/head"
 
 export default function PaymentFinishPage() {
   const router = useRouter()
-
-  // useEffect(() => {
-  //   // Optional: ambil parameter dari query jika perlu
-  //   const { order_id, status_code, transaction_status } = router.query
-
-  //   console.log("Redirect from Midtrans:")
-  //   console.log({ order_id, status_code, transaction_status })
-
-  //   // Optional: kamu bisa redirect ke dashboard atau halaman tiket
-  //   // setTimeout(() => router.push("/my-tickets"), 3000)
-  // }, [router.query])
-
   return (
     <>
       <Head>

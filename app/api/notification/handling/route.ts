@@ -26,16 +26,16 @@ export async function POST(req: NextRequest) {
 
     // ✅ Handle payment status
     if (transaction_status === "capture" || transaction_status === "settlement") {
-      console.log("✅ Payment successful:", order_id, 'payment-handling.ts')
+      // console.log("✅ Payment successful:", order_id, 'payment-handling.ts')
       // TODO: update Firestore/ticket DB here
     } else if (transaction_status === "pending") {
-      console.log("⏳ Payment pending:", order_id)
+      // console.log("⏳ Payment pending:", order_id)
     } else if (
       transaction_status === "deny" ||
       transaction_status === "cancel" ||
       transaction_status === "expire"
     ) {
-      console.log("❌ Payment failed:", order_id)
+      // console.log("❌ Payment failed:", order_id)
     }
 
     return new Response(JSON.stringify({ message: "Notification received" }), {

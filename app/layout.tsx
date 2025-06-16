@@ -65,7 +65,6 @@ export default function RootLayout({
 }>) {
   const midtransClientKey = process.env.MIDTRANS_CLIENT_KEY;
   const midtransEnv = process.env.MIDTRANS_ENV || "sandbox";
-  console.log(midtransEnv, 'midtrans Env')
   const snapJsUrl =
   midtransEnv === "production"
     ? "https://app.midtrans.com/snap/snap.js"

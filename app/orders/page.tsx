@@ -66,7 +66,6 @@ export default function OrdersPage() {
           const sortedTickets = [...userTickets].sort((a, b) => {
             return b.purchaseDate.toMillis() - a.purchaseDate.toMillis();
           });
-          console.log(sortedTickets, "sorted tickets");
 
           setTickets(sortedTickets);
 
@@ -142,11 +141,9 @@ export default function OrdersPage() {
   }) => {
     const event = ticketEvents[ticket.eventId];
     if (!event) return;
-    console.log(event, "event 180 page orders");
     const ticketElement = document.getElementById(
       `ticket-download-${ticket.id}`
     );
-    console.log(ticketElement, "ticket element 184");
     if (!ticketElement) return;
 
     const canvas = await html2canvas(ticketElement);
@@ -293,7 +290,6 @@ export default function OrdersPage() {
             {pastTickets.length > 0 ? (
               <div className="space-y-6">
                 {pastTickets.map((ticket) => {
-                  console.log(ticket, "ticket orders");
                   const eventItem = ticketEvents[ticket.eventId];
                   if (!eventItem) return null;
 

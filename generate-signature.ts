@@ -9,7 +9,3 @@ const serverKey = process.env.MIDTRANS_SERVER_KEY!;
 
 const input = orderId + statusCode + grossAmount + serverKey;
 const signature = crypto.createHash("sha512").update(input).digest("hex");
-
-console.log("Server Key:", serverKey);
-console.log("Generated Signature Key:");
-console.log(signature);
