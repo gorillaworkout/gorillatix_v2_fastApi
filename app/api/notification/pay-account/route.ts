@@ -81,38 +81,40 @@ const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY || ""
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { order_id, status_code, gross_amount, signature_key, transaction_status } = body
+    const body = await req.json();
+    console.log("Received notification body:", body);
 
-    // Verify signature
+    const { order_id, status_code, gross_amount, signature_key, transaction_status } = body;
+
     const expectedSignature = crypto
       .createHash("sha512")
       .update(order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY)
-      .digest("hex")
+      .digest("hex");
+
+    console.log({ expectedSignature, signature_key });
 
     if (signature_key !== expectedSignature) {
-      return NextResponse.json({ message: "Invalid signature" }, { status: 403 })
+      console.warn("Signature mismatch");
+      return NextResponse.json({ message: "Invalid signature" }, { status: 403 });
     }
 
-    let newStatus = ""
-    if (transaction_status === "settlement") {
-      newStatus = "paid"
-    } else if (transaction_status === "pending") {
-      newStatus = "pending"
-    } else if (transaction_status === "expire") {
-      newStatus = "expired"
-    }
+    let newStatus = "";
+    if (transaction_status === "settlement") newStatus = "paid";
+    else if (transaction_status === "pending") newStatus = "pending";
+    else if (transaction_status === "expire") newStatus = "expired";
 
     if (newStatus) {
+      console.log(`Updating order ${order_id} to status ${newStatus}`);
       await db.collection("tickets").doc(order_id).set({
         status: newStatus,
         updatedAt: new Date(),
-      }, { merge: true })
+      }, { merge: true });
     }
 
-    return NextResponse.json({ message: "Pay Account notification handled" })
+    return NextResponse.json({ message: "Pay Account notification handled" });
   } catch (error) {
-    console.error("Pay Account notification error:", error)
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+    console.error("Pay Account notification error:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
+
