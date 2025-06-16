@@ -156,6 +156,14 @@ export function SiteHeader() {
                       </DropdownMenuItem>
                     </>
                   )}
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/scan">Scan Ticket</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
                     {isSigningOut ? "Signing out..." : "Log out"}
@@ -218,6 +226,11 @@ export function SiteHeader() {
                     {isAdmin && (
                       <Link href="/admin/dashboard" className="text-sm font-medium">
                         Admin Dashboard
+                      </Link>
+                    )}
+                    {isAdmin && (
+                      <Link href="/admin/scan" className="text-sm font-medium">
+                        Scan Ticket
                       </Link>
                     )}
                     <button onClick={handleSignOut} className="text-sm font-medium text-left" disabled={isSigningOut}>

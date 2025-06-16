@@ -54,7 +54,7 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/refund" className="text-muted-foreground hover:text-foreground">
+                <Link href="/refund-policy" className="text-muted-foreground hover:text-foreground">
                   Refund Policy
                 </Link>
               </li>
