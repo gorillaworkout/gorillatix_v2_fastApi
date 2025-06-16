@@ -92,6 +92,12 @@ export async function POST(req: NextRequest) {
       .digest("hex");
 
     console.log({ expectedSignature, signature_key });
+    console.log("order_id:", order_id);
+    console.log("status_code:", status_code);
+    console.log("gross_amount:", gross_amount);
+    console.log("MIDTRANS_SERVER_KEY:", MIDTRANS_SERVER_KEY);
+    console.log("signature_key from Midtrans:", signature_key);
+    console.log("expectedSignature calculated:", expectedSignature);
 
     if (signature_key !== expectedSignature) {
       console.warn("Signature mismatch");

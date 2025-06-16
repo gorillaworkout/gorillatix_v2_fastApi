@@ -32,7 +32,7 @@ async function sendCallback(orderId, statusCode, grossAmount, transactionStatus)
 
 async function runTest() {
   const requests = []
-  const totalRequests = 200 // banyaknya request paralel yang ingin kamu test
+  const totalRequests = 1 // banyaknya request paralel yang ingin kamu test
 
   for (let i = 1; i <= totalRequests; i++) {
     // Buat order_id unik supaya tidak bentrok, contoh "test-order-1", "test-order-2", dst
