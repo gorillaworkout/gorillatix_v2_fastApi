@@ -9,51 +9,35 @@
 // export const config = {
 //   matcher: ["/admin/:path*"],
 // }
-import { NextRequest, NextResponse } from "next/server"
-import { Ratelimit } from "@upstash/ratelimit"
-import { Redis } from "@upstash/redis"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import {Redis} from "@upstash/redis"
 
-// Inisialisasi Redis dari Upstash
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 })
 
-// Aturan rate limit: max 10 requests per 60 detik
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, "60s"),
-  analytics: true,
-})
+const WINDOW_SIZE_IN_SECONDS = 60
+const MAX_REQUESTS = 10
 
-export async function middleware(request: NextRequest) {
-  // Ambil IP dari header 'x-forwarded-for', gunakan fallback
-  const forwarded = request.headers.get("x-forwarded-for")
-  const ip = forwarded?.split(",")[0]?.trim() ?? "127.0.0.1"
+export async function middleware(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
 
-  // Jalankan limit
-  const { success, limit, remaining, reset } = await ratelimit.limit(ip)
-
-  if (!success) {
-    return new NextResponse("Too many requests", {
-      status: 429,
-      headers: {
-        "X-RateLimit-Limit": limit.toString(),
-        "X-RateLimit-Remaining": remaining.toString(),
-        "X-RateLimit-Reset": reset.toString(),
-      },
-    })
+  const key = `rate-limit:${ip}`
+  
+  const requests = await redis.incr(key)
+  if (requests === 1) {
+    await redis.expire(key, WINDOW_SIZE_IN_SECONDS)
   }
 
+  if (requests > MAX_REQUESTS) {
+    const ttl = await redis.ttl(key)
+    const retryAfter = ttl > 0 ? ttl : WINDOW_SIZE_IN_SECONDS
+    const res = NextResponse.json({ message: `Too many requests. Please wait ${retryAfter} seconds.` }, { status: 429 })
+    res.headers.set("Retry-After", retryAfter.toString())
+    return res
+  }
+  
   return NextResponse.next()
-}
-
-// Batasi hanya route penting (bisa kamu sesuaikan)
-export const config = {
-  matcher: [
-    "/checkout",
-    "/orders",
-    "/events/:path*",
-    "/contact",
-  ],
 }
