@@ -1,8 +1,8 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function formatDate(dateString: string) {
@@ -10,8 +10,8 @@ export function formatDate(dateString: string) {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }
-  return new Date(dateString).toLocaleDateString("en-US", options)
+  };
+  return new Date(dateString).toLocaleDateString("en-US", options);
 }
 
 // Format currency to Rupiah
@@ -21,5 +21,11 @@ export function formatRupiah(amount: number) {
     currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount)
+  }).format(amount);
 }
+
+export const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};

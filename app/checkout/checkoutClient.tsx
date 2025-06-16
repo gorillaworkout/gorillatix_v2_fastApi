@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CalendarDays, CreditCard, Loader2, MapPin } from "lucide-react";
+import { CalendarDays, Check, CreditCard, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,7 +38,7 @@ import { useEvents } from "@/context/event-context";
 import { processTicketPurchase } from "./actions";
 import { useAuth } from "@/components/auth-provider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { formatRupiah } from "@/lib/utils";
+import { formatRupiah, formatTime } from "@/lib/utils";
 import Loader from "@/components/loading";
 import { EventItem } from "@/types/event";
 import { releaseTickets, reserveTickets } from "@/lib/firebase-service";
@@ -145,6 +145,7 @@ export default function CheckoutClient({
   const total = subtotal + fees + serviceCharge;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
     if (!event || !user) return;
 
     setIsLoading(true);
@@ -295,9 +296,39 @@ export default function CheckoutClient({
       // ✅ Always executed
       setIsLoading(false);
       setIsLoadingPayment(false);
+      setDisabledTimeLeft(COUNTDOWN_SECONDS);
+
     }
   }
 
+  // countdown button 3 minutes
+  const COUNTDOWN_SECONDS = 180; // 3 menit
+  const [disabledTimeLeft, setDisabledTimeLeft] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (disabledTimeLeft === 0 && timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+
+    if (disabledTimeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setDisabledTimeLeft(prev => {
+          if (prev <= 1) {
+            if (timerRef.current) clearInterval(timerRef.current)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [disabledTimeLeft])
+
+  // countdown button 3 minutes
   if (isLoadingPayment) return <Loader title="Preparing your tickets" />;
   if (authLoading || isLoadingEvent)
     return <Loader title="Loading event details..." />;
@@ -432,7 +463,7 @@ export default function CheckoutClient({
                 />
               </div>
 
-              <Button
+              {/* <Button
                 type="submit"
                 disabled={isLoading}
                 className="w-full flex items-center justify-center gap-2"
@@ -440,6 +471,18 @@ export default function CheckoutClient({
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 <CreditCard className="h-5 w-5" />
                 Pay Now
+              </Button> */}
+              <Button
+                type="submit"
+                disabled={isLoading || disabledTimeLeft > 0}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                {(isLoading || disabledTimeLeft > 0) && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                {isLoading || disabledTimeLeft > 0? '' : <CreditCard className="h-5 w-5" />}
+              
+                 {disabledTimeLeft > 0 ? `Please wait ${formatTime(disabledTimeLeft)}` : "Pay Now"}
               </Button>
             </form>
           </Form>
