@@ -16,6 +16,7 @@ import Head from "next/head";
 import LocationSection from "./../../../components/locatioSection";
 import { useRouter } from "next/navigation";
 import { ShareEventSection } from "@/components/share-event-section";
+import { TicketButton } from "@/components/ticket-button";
 
 export default function EventPage() {
   const params = useParams();
@@ -199,10 +200,11 @@ export default function EventPage() {
                       event={{
                         venue: event.venue,
                         address: event.address,
-                        latitude: -6.996301771459569,
-                        longitude: 107.52967155378118,
+                        latitude: Number(event.latitude),
+                        longitude: Number(event.longitude),
                       }}
                     />
+                    {/* 35.66781278107372, 139.6995449821261 */}
                     {/* -6.996301771459569, 107.52967155378118 */}
                   </div>
                 </div>
@@ -253,14 +255,14 @@ export default function EventPage() {
 
                   <Separator />
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-2">
                     <Ticket className="h-4 w-4" />
                     <span className="text-sm text-muted-foreground">
                       Tickets will be sent to your email
                     </span>
                   </div>
 
-                  <Button
+                  {/* <Button
                     className="w-full"
                     size="lg"
                     disabled={event.ticketsAvailable <= 0}
@@ -269,10 +271,20 @@ export default function EventPage() {
                     <Link href={`/checkout?eventId=${event.id}`}>
                       {event.ticketsAvailable > 0 ? "Buy Tickets" : "Sold Out"}
                     </Link>
-                  </Button>
+                  </Button> */}
+                  <TicketButton
+                    slug={event.slug}
+                    startSellingDate={event.startSellingDate}
+                    endSellingDate={event.endSellingDate}
+                    ticketsAvailable={event.ticketsAvailable}
+                    status={event.status}
+                    eventId={event.id}
+                    
+                  />
+
 
                   <p className="text-xs text-center text-muted-foreground mt-2">
-                    Secure checkout powered by Stripe
+                    Secure checkout powered by Midtrans
                   </p>
                 </div>
               </div>

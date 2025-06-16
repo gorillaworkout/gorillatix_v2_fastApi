@@ -25,6 +25,8 @@ export interface EventItem {
   ticketsSold: number;
   startSellingDate: string;
   endSellingDate: string;
+  latitude: string;
+  longitude: string;
 }
 
 export interface EventInput {
