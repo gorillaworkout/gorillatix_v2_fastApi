@@ -91,14 +91,6 @@ export async function POST(req: NextRequest) {
       .update(order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY)
       .digest("hex");
 
-    console.log({ expectedSignature, signature_key });
-    console.log("order_id:", order_id);
-    console.log("status_code:", status_code);
-    console.log("gross_amount:", gross_amount);
-    console.log("MIDTRANS_SERVER_KEY:", MIDTRANS_SERVER_KEY);
-    console.log("signature_key from Midtrans:", signature_key);
-    console.log("expectedSignature calculated:", expectedSignature);
-
     if (signature_key !== expectedSignature) {
       console.warn("Signature mismatch");
       return NextResponse.json({ message: "Invalid signature" }, { status: 403 });
@@ -110,7 +102,6 @@ export async function POST(req: NextRequest) {
     else if (transaction_status === "expire") newStatus = "expired";
 
     if (newStatus) {
-      console.log(`Updating order ${order_id} to status ${newStatus}`);
       await db.collection("tickets").doc(order_id).set({
         status: newStatus,
         updatedAt: new Date(),
