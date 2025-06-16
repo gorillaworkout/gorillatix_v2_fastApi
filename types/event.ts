@@ -27,6 +27,7 @@ export interface EventItem {
   endSellingDate: string;
   latitude: string;
   longitude: string;
+  timeSelling: string;
 }
 
 export interface EventInput {

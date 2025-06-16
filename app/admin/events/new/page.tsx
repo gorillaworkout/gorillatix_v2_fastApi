@@ -47,6 +47,7 @@ const formSchema = z.object({
   category: z.string().min(1, { message: "Please select a category" }),
   date: z.date({ required_error: "Please select a date" }),
   time: z.string().min(1, { message: "Please enter a time" }),
+  timeSelling: z.string().min(1, { message: "Please enter a time selling" }),
   venue: z.string().min(3, { message: "Venue must be at least 3 characters" }),
   address: z
     .string()
@@ -126,6 +127,9 @@ export default function NewEventPage() {
         userId: "",
         startSellingDate: values.startSellingDate.toISOString().split("T")[0],
         endSellingDate: values.startSellingDate.toISOString().split("T")[0],
+        latitude:"",
+        longitude:"",
+        timeSelling: values.timeSelling
       });
       if (newEvent) {
         toast({
@@ -403,6 +407,22 @@ export default function NewEventPage() {
                       </FormControl>
                       <FormDescription>
                         The start time of your event.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="timeSelling"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Time Selling</FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        The start time selling of your event.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
