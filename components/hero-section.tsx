@@ -12,7 +12,7 @@ export function HeroSection() {
         <link
           rel="preload"
           as="image"
-          href="/_next/image?url=%2Fimages%2Fhero_logo_gtix.webp&w=480&q=60"
+          href="/_next/image?url=%2Fimages%2Fhero_logo_gtix.jpg=480&q=60"
         />
       </Head>
 
@@ -55,12 +55,12 @@ export function HeroSection() {
             <div className="flex items-center justify-center">
               <div className="relative w-full aspect-video overflow-hidden rounded-xl">
                 <Image
-                  src="/images/hero_logo_gtix.webp"
+                  src="/images/hero_logo_gtix.jpg"
                   alt="Featured events"
                   width={800} // Adjust width based on your layout needs
                   height={450} // Maintain aspect ratio
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="rounded-xl object-cover w-full h-full"
+                  className="rounded-xl"
                   priority
                   placeholder="blur"
                   blurDataURL="/images/hero_logo_gtix_placeholder.webp"

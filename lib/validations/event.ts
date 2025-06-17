@@ -12,7 +12,7 @@ export const eventFormSchema = z.object({
   description: z.string(),
   imageUrl: z.string().optional(),
   price: z.number(),
-  ticketsAvailable: z.number(),
+  ticketsAvailable: z.number().optional(),
   ticketsSold: z.number(),
   organizer: z.string(),
   organizerDescription: z.string(),

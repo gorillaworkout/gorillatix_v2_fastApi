@@ -80,6 +80,7 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
     try {
       await updateEvent(eventId, data);
       toast({ title: "Event updated successfully." });
+      window.location.href = "/admin/dashboard";  
     } catch (error) {
       toast({
         variant: "destructive",
@@ -139,7 +140,12 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
                   <FormItem>
                     <FormLabel>Venue</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Venue name" />
+                      {/* <Input {...field} placeholder="Venue name" /> */}
+                      <Input
+                        type="venue"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -154,7 +160,12 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Location" />
+                      {/* <Input {...field} placeholder="Location" /> */}
+                      <Input
+                        type="location"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -220,7 +231,11 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
                       <Input
                         type="number"
                         value={field.value ?? ""}
-                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        onChange={(e)=>{
+                          const val = e.target.value
+                          const parsed = val === "" ? "" : parseInt(val)
+                          field.onChange(parsed)
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -362,14 +377,19 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
                   <FormItem>
                     <FormLabel>Start Selling Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      {/* <Input type="time" {...field} /> */}
+                      <Input
+                        type="timeSelling"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
                     </FormControl>
                     <FormDescription>When ticket sales begin.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               {/* Start Selling Date */}
               <FormField
                 control={form.control}
