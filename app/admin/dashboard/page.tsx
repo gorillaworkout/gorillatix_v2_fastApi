@@ -1,19 +1,40 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { CalendarDays, CreditCard, DollarSign, Download, LineChart, Loader2, Ticket, Users } from "lucide-react"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  CalendarDays,
+  CreditCard,
+  DollarSign,
+  Download,
+  LineChart,
+  Loader2,
+  Ticket,
+  Users,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AdminSalesChart } from "@/components/admin/sales-chart"
-import { AdminRecentSales } from "@/components/admin/recent-sales"
-import { AdminEventsList } from "@/components/admin/events-list"
-import { getTotalRevenue, getTicketsSold, getActiveEventsCount, getUsersCount } from "@/lib/admin-service"
-import { useAuth } from "@/components/auth-provider"
-import { useRouter } from "next/navigation"
-import { formatRupiah } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminSalesChart } from "@/components/admin/sales-chart";
+import { AdminRecentSales } from "@/components/admin/recent-sales";
+import { AdminEventsList } from "@/components/admin/events-list";
+import {
+  getTotalRevenue,
+  getTicketsSold,
+  getActiveEventsCount,
+  getUsersCount,
+} from "@/lib/admin-service";
+import { useAuth } from "@/components/auth-provider";
+import { useRouter } from "next/navigation";
+import { formatRupiah } from "@/lib/utils";
+import TicketsPage from "@/components/admin/tickets-list";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -21,16 +42,16 @@ export default function AdminDashboardPage() {
     tickets: { total: 0, percentChange: 0 },
     events: { total: 0, newThisWeek: 0 },
     users: { total: 0, newThisWeek: 0 },
-  })
-  const [loading, setLoading] = useState(true)
-  const { user, loading: authLoading } = useAuth()
-  const router = useRouter()
+  });
+  const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     // Check if user is admin
     if (!authLoading && (!user || user.role !== "admin")) {
-      router.push("/")
-      return
+      router.push("/");
+      return;
     }
 
     async function fetchDashboardData() {
@@ -40,25 +61,25 @@ export default function AdminDashboardPage() {
           getTicketsSold(),
           getActiveEventsCount(),
           getUsersCount(),
-        ])
+        ]);
 
         setStats({
           revenue,
           tickets,
           events,
           users,
-        })
+        });
       } catch (error) {
-        console.error("Error fetching dashboard data:", error)
+        console.error("Error fetching dashboard data:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
     if (!authLoading && user && user.role === "admin") {
-      fetchDashboardData()
+      fetchDashboardData();
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router]);
 
   if (authLoading || loading) {
     return (
@@ -68,7 +89,7 @@ export default function AdminDashboardPage() {
           <p>Loading dashboard data...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -86,7 +107,7 @@ export default function AdminDashboardPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="tickets">Tickets</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
@@ -94,11 +115,15 @@ export default function AdminDashboardPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{formatRupiah(stats.revenue.total)}</div>
+                <div className="text-2xl font-bold">
+                  {formatRupiah(stats.revenue.total)}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {stats.revenue.percentChange >= 0 ? "+" : ""}
                   {stats.revenue.percentChange.toFixed(1)}% from last month
@@ -108,7 +133,9 @@ export default function AdminDashboardPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Tickets Sold</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Tickets Sold
+                </CardTitle>
                 <Ticket className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -122,23 +149,31 @@ export default function AdminDashboardPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Events</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Active Events
+                </CardTitle>
                 <CalendarDays className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.events.total}</div>
-                <p className="text-xs text-muted-foreground">+{stats.events.newThisWeek} new events this week</p>
+                <p className="text-xs text-muted-foreground">
+                  +{stats.events.newThisWeek} new events this week
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Users
+                </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.users.total}</div>
-                <p className="text-xs text-muted-foreground">+{stats.users.newThisWeek} new users this week</p>
+                <p className="text-xs text-muted-foreground">
+                  +{stats.users.newThisWeek} new users this week
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -147,7 +182,9 @@ export default function AdminDashboardPage() {
             <Card className="col-span-4">
               <CardHeader>
                 <CardTitle>Sales Overview</CardTitle>
-                <CardDescription>Monthly revenue for the current year</CardDescription>
+                <CardDescription>
+                  Monthly revenue for the current year
+                </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
                 <AdminSalesChart />
@@ -157,14 +194,29 @@ export default function AdminDashboardPage() {
             <Card className="col-span-3">
               <CardHeader>
                 <CardTitle>Recent Sales</CardTitle>
-                <CardDescription>Latest transactions across all events</CardDescription>
+                <CardDescription>
+                  Latest transactions across all events
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <AdminRecentSales />
               </CardContent>
             </Card>
           </div>
-
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Add Ticket Manual</CardTitle>
+                <CardDescription>Manage your ticket events</CardDescription>
+              </div>
+              <Button asChild>
+                <Link href="/admin/events/addTicket">Add Ticket</Link>
+              </Button>
+            </CardHeader>
+            {/* <CardContent>
+              <AdminEventsList />
+            </CardContent> */}
+          </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -181,18 +233,17 @@ export default function AdminDashboardPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-4">
+        <TabsContent value="tickets" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-              <CardDescription>Detailed analytics for your events and sales</CardDescription>
+              <CardTitle>Tickets</CardTitle>
+              <CardDescription>
+                Ticket Detailed
+              </CardDescription>
             </CardHeader>
-            <CardContent className="h-[400px] flex items-center justify-center">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <LineChart className="h-10 w-10" />
-                <p>Detailed analytics will be displayed here</p>
-              </div>
-            </CardContent>
+            <CardContent>
+                <TicketsPage />
+              </CardContent>
           </Card>
         </TabsContent>
 
@@ -212,5 +263,5 @@ export default function AdminDashboardPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

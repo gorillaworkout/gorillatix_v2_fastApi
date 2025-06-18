@@ -13,6 +13,8 @@ import {
   Timestamp,
   limit,
   runTransaction,
+  setDoc,
+  increment,
 } from "firebase/firestore";
 import { db, auth } from "./firebase";
 // import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
@@ -536,5 +538,35 @@ export async function updateTicketStatus(ticketId: string, status: string) {
   } catch (error) {
     console.error("Failed to update ticket status:", error);
     throw new Error("Unable to update ticket status");
+  }
+}
+
+export async function createTicket(ticketData: {
+  customerName: string;
+  eventId: string;
+  eventName: string;
+  orderId: string;
+  purchaseDate: Date;
+  quantity: number;
+  status: string;
+  totalPrice: number;
+  userId: string;
+  venue: string;
+}) {
+  try {
+    // 1. Simpan tiket ke koleksi "tickets"
+    const ticketRef = doc(db, "tickets", ticketData.orderId);
+    await setDoc(ticketRef, ticketData);
+
+    // 2. Tambahkan quantity ke field ticketsSold di event terkait
+    const eventRef = doc(db, "events", ticketData.eventId);
+    await updateDoc(eventRef, {
+      ticketsSold: increment(ticketData.quantity),
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error creating ticket and updating event:", error);
+    throw error;
   }
 }
