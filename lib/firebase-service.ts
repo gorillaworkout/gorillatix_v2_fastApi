@@ -465,19 +465,19 @@ export async function reserveTickets(eventId: string, quantity: number) {
 }
 
 // Fungsi untuk rollback tiket (kembalikan stok)
-// export async function releaseTickets(eventId: string, quantity: number) {
-//   const eventRef = doc(db, "events", eventId);
-//   await runTransaction(db, async (transaction) => {
-//     const eventDoc = await transaction.get(eventRef);
-//     if (!eventDoc.exists()) throw new Error("Event not found");
+export async function releaseTickets(eventId: string, quantity: number) {
+  const eventRef = doc(db, "events", eventId);
+  await runTransaction(db, async (transaction) => {
+    const eventDoc = await transaction.get(eventRef);
+    if (!eventDoc.exists()) throw new Error("Event not found");
 
-//     const currentStock = eventDoc.data().ticketsAvailable;
+    const currentStock = eventDoc.data().ticketsAvailable;
 
-//     transaction.update(eventRef, {
-//       ticketsAvailable: currentStock + quantity,
-//     });
-//   });
-// }
+    transaction.update(eventRef, {
+      ticketsAvailable: currentStock + quantity,
+    });
+  });
+}
 type TicketData = {
   eventId: string;
   quantity: number;

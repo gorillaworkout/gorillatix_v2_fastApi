@@ -42,6 +42,7 @@ import { formatRupiah, formatTime } from "@/lib/utils";
 import Loader from "@/components/loading";
 import { EventItem } from "@/types/event";
 import {
+  releaseTickets,
   releaseTicketsByOrderId,
   reserveTickets,
   updateTicketStatus,
@@ -150,166 +151,6 @@ export default function CheckoutClient({
   const serviceCharge = 5000;
   const total = subtotal + fees + serviceCharge;
 
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
-  //   if (!event || !user) return;
-
-  //   setIsLoading(true);
-  //   setError(null);
-  //   let didReserve = false;
-
-  //   try {
-  //     await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
-  //     didReserve = true;
-
-  //     const transactionPayload = {
-  //       firstName: values.firstName,
-  //       lastName: values.lastName,
-  //       email: values.email,
-  //       phone: values.phone,
-  //       quantity: parseInt(values.quantity),
-  //       price: total,
-  //       eventName:event.title
-  //     };
-
-  //     const response = await fetch("/api/transaction", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(transactionPayload),
-  //     });
-
-  //     if (!response.ok) throw new Error("Failed to create transaction");
-  //     const data: { token: string } = await response.json();
-
-  //     setIsLoadingPayment(true);
-
-  //     const snap = (window as any).snap;
-
-  //     // 🧠 Bungkus snap.pay agar bisa diawait
-  //     await new Promise<void>((resolve) => {
-  //       snap?.pay(data.token, {
-  //         onSuccess: async () => {
-  //           const formData = new FormData();
-  //           formData.append("eventId", event.id);
-  //           formData.append("quantity", values.quantity);
-  //           formData.append("price", total.toString());
-  //           formData.append("userId", user.uid);
-  //           formData.append(
-  //             "customerName",
-  //             `${values.firstName} ${values.lastName}`
-  //           );
-  //           formData.append("venue", event.venue);
-  //           formData.append("status", "confirmed");
-
-  //           try {
-  //             const result = await processTicketPurchase(formData);
-  //             if (result.success) {
-  //               toast({
-  //                 title: "Payment successful",
-  //                 description: "You can view your ticket on My Ticket page.",
-  //               });
-  //               router.push(`/payment-success?ticketId=${result.ticketId}`);
-  //             } else {
-  //               setError(
-  //                 result.message || "Failed to save ticket after payment."
-  //               );
-  //               toast({
-  //                 variant: "destructive",
-  //                 title: "Ticket Processing Failed",
-  //                 description: "Payment succeeded but ticket creation failed.",
-  //               });
-  //             }
-  //           } catch (err) {
-  //             console.error("Ticket error:", err);
-  //             toast({
-  //               variant: "destructive",
-  //               title: "Ticket Save Error",
-  //               description: "Please contact support.",
-  //             });
-  //           } finally {
-  //             resolve();
-  //           }
-  //         },
-
-  //         onPending: async () => {
-  //           if (didReserve) {
-  //             await releaseTickets(event.id, parseInt(values.quantity));
-  //           }
-  //           toast({
-  //             title: "Payment pending",
-  //             description: "Please complete the payment from your bank app.",
-  //           });
-  //           resolve();
-  //         },
-
-  //         onError: async () => {
-  //           if (didReserve) {
-  //             await releaseTickets(event.id, parseInt(values.quantity));
-  //           }
-  //           toast({
-  //             variant: "destructive",
-  //             title: "Payment failed",
-  //             description: "An error occurred during payment.",
-  //           });
-  //           resolve();
-  //         },
-
-  //         onClose: async () => {
-  //           if (didReserve) {
-  //             await releaseTickets(event.id, parseInt(values.quantity));
-  //           }
-  //           toast({
-  //             title: "Payment cancelled",
-  //             description:
-  //               "You closed the payment popup. No ticket was created.",
-  //           });
-  //           resolve();
-  //         },
-  //       });
-  //     });
-  //   } catch (err) {
-  //     if (didReserve) {
-  //       await releaseTickets(event.id, parseInt(values.quantity));
-  //     }
-
-  //     if (err instanceof Error) {
-  //       if (err.message.includes("Tickets are sold out")) {
-  //         toast({
-  //           variant: "destructive",
-  //           title: "Tickets Unavailable",
-  //           description:
-  //             "The tickets have been sold out or held by other users. Please try another event.",
-  //         });
-  //         router.push("/");
-  //         return;
-  //       }
-
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Ticket Reservation Failed",
-  //         description:
-  //           err.message || "An error occurred while reserving your tickets.",
-  //       });
-  //     } else {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Ticket Reservation Failed",
-  //         description:
-  //           "An unknown error occurred while reserving your tickets.",
-  //       });
-  //     }
-  //     return;
-  //   } finally {
-  //     // ✅ Always executed
-  //     setIsLoading(false);
-  //     setIsLoadingPayment(false);
-  //     setDisabledTimeLeft(COUNTDOWN_SECONDS);
-
-  //   }
-  // }
-
-  // countdown button 3 minutes
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
     if (!event || !user) return;
@@ -317,43 +158,39 @@ export default function CheckoutClient({
     setIsLoading(true);
     setError(null);
     let didReserve = false;
-    let ticketId: string | null = null;
 
-    let ticketCount = 0;
     try {
-      const q = query(
-        collection(db, "tickets"),
-        where("eventId", "==", event.id)
-      );
-      const snapshot = await getDocs(q);
-      ticketCount = snapshot.size;
-    } catch (err) {
-      console.error("Failed to count tickets:", err);
-      return new Response("Failed to generate order ID", { status: 500 });
-    }
-
-    // 🆔 Generate unique order ID
-    const orderNumber = ticketCount + 1;
-    const eventSlug = event.title.trim().replace(/\s+/g, "-");
-    const orderId = `ORDER-${eventSlug}-${values.firstName}-${orderNumber}`;
-    console.log(orderId, "order ID");
-    try {
-      // Reserve tickets
-      await reserveTickets(event.id, parseInt(values.quantity));
+      await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
       didReserve = true;
+      let ticketCount = 0;
+      try {
+        const q = query(
+          collection(db, "tickets"),
+          where("eventId", "==", event.id)
+        );
+        const snapshot = await getDocs(q);
+        ticketCount = snapshot.size;
+      } catch (err) {
+        console.error("Failed to count tickets:", err);
+        return new Response("Failed to generate order ID", {
+          status: 500,
+        });
+      }
 
-      // 🔍 Get total existing tickets for the event
+      // 🆔 Generate unique order ID
+      const orderNumber = ticketCount + 1;
+      const eventSlug = event.title.trim().replace(/\s+/g, "-");
+      const orderId = `ORDER-${eventSlug}-${values.firstName}-${orderNumber}`;
+      console.log(orderId, "order ID");
 
-      // Create transaction first
       const transactionPayload = {
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
         phone: values.phone,
         quantity: parseInt(values.quantity),
-        price: total,
+        price: event.price,
         eventName: event.title,
-        eventId: event.id,
         orderId: orderId,
       };
 
@@ -366,50 +203,61 @@ export default function CheckoutClient({
       if (!response.ok) throw new Error("Failed to create transaction");
       const data: { token: string } = await response.json();
 
-      // Create ticket immediately (status: waiting_payment)
-      const initialFormData = new FormData();
-      initialFormData.append("eventId", event.id);
-      initialFormData.append("quantity", values.quantity);
-      initialFormData.append("price", total.toString());
-      initialFormData.append("userId", user.uid);
-      initialFormData.append(
-        "customerName",
-        `${values.firstName} ${values.lastName}`
-      );
-      initialFormData.append("venue", event.venue);
-      initialFormData.append("status", "waiting_payment");
-      initialFormData.append("orderId", orderId);
-
-      const ticketResult = await processTicketPurchase(initialFormData);
-      if (!ticketResult.success || !ticketResult.ticketId) {
-        throw new Error("Failed to create ticket before payment.");
-      }
-
-      ticketId = ticketResult.ticketId;
       setIsLoadingPayment(true);
 
       const snap = (window as any).snap;
 
+      // 🧠 Bungkus snap.pay agar bisa diawait
       await new Promise<void>((resolve) => {
         snap?.pay(data.token, {
           onSuccess: async () => {
-            if (ticketId) {
-              await updateTicketStatus(ticketId, "confirmed");
+            const formData = new FormData();
+            formData.append("eventId", event.id);
+            formData.append("quantity", values.quantity);
+            formData.append("price", total.toString());
+            formData.append("userId", user.uid);
+            formData.append(
+              "customerName",
+              `${values.firstName} ${values.lastName}`
+            );
+            formData.append("venue", event.venue);
+            formData.append("status", "confirmed");
+            // initialFormData.append("orderId", orderId);
+            formData.append("orderId", orderId);
+
+            try {
+              const result = await processTicketPurchase(formData);
+              if (result.success) {
+                toast({
+                  title: "Payment successful",
+                  description: "You can view your ticket on My Ticket page.",
+                });
+                router.push(`/payment-success?ticketId=${result.ticketId}`);
+              } else {
+                setError(
+                  result.message || "Failed to save ticket after payment."
+                );
+                toast({
+                  variant: "destructive",
+                  title: "Ticket Processing Failed",
+                  description: "Payment succeeded but ticket creation failed.",
+                });
+              }
+            } catch (err) {
+              console.error("Ticket error:", err);
+              toast({
+                variant: "destructive",
+                title: "Ticket Save Error",
+                description: "Please contact support.",
+              });
+            } finally {
+              resolve();
             }
-            toast({
-              title: "Payment successful",
-              description: "You can view your ticket on My Ticket page.",
-            });
-            router.push(`/payment-success?ticketId=${ticketId}`);
-            resolve();
           },
 
           onPending: async () => {
             if (didReserve) {
-              await releaseTicketsByOrderId(orderId);
-            }
-            if (ticketId) {
-              await updateTicketStatus(ticketId, "Pending");
+              await releaseTickets(event.id, parseInt(values.quantity));
             }
             toast({
               title: "Payment pending",
@@ -420,10 +268,7 @@ export default function CheckoutClient({
 
           onError: async () => {
             if (didReserve) {
-              await releaseTicketsByOrderId(orderId);
-            }
-            if (ticketId) {
-              await updateTicketStatus(ticketId, "cancelled");
+              await releaseTickets(event.id, parseInt(values.quantity));
             }
             toast({
               variant: "destructive",
@@ -435,10 +280,7 @@ export default function CheckoutClient({
 
           onClose: async () => {
             if (didReserve) {
-              await releaseTicketsByOrderId(orderId);
-            }
-            if (ticketId) {
-              await updateTicketStatus(ticketId, "cancelled");
+              await releaseTickets(event.id, parseInt(values.quantity));
             }
             toast({
               title: "Payment cancelled",
@@ -451,7 +293,7 @@ export default function CheckoutClient({
       });
     } catch (err) {
       if (didReserve) {
-        await releaseTicketsByOrderId(orderId);
+        await releaseTickets(event.id, parseInt(values.quantity));
       }
 
       if (err instanceof Error) {
@@ -482,11 +324,192 @@ export default function CheckoutClient({
       }
       return;
     } finally {
+      // ✅ Always executed
       setIsLoading(false);
       setIsLoadingPayment(false);
       setDisabledTimeLeft(COUNTDOWN_SECONDS);
     }
   }
+
+  // countdown button 3 minutes
+
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
+  //   if (!event || !user) return;
+
+  //   setIsLoading(true);
+  //   setError(null);
+  //   let didReserve = false;
+  //   let ticketId: string | null = null;
+
+  // let ticketCount = 0;
+  // try {
+  //   const q = query(
+  //     collection(db, "tickets"),
+  //     where("eventId", "==", event.id)
+  //   );
+  //   const snapshot = await getDocs(q);
+  //   ticketCount = snapshot.size;
+  // } catch (err) {
+  //   console.error("Failed to count tickets:", err);
+  //   return new Response("Failed to generate order ID", { status: 500 });
+  // }
+
+  // // 🆔 Generate unique order ID
+  // const orderNumber = ticketCount + 1;
+  // const eventSlug = event.title.trim().replace(/\s+/g, "-");
+  // const orderId = `ORDER-${eventSlug}-${values.firstName}-${orderNumber}`;
+  // console.log(orderId, "order ID");
+  //   try {
+  //     // Reserve tickets
+  //     await reserveTickets(event.id, parseInt(values.quantity));
+  //     didReserve = true;
+
+  //     // 🔍 Get total existing tickets for the event
+
+  //     // Create transaction first
+  //     const transactionPayload = {
+  //       firstName: values.firstName,
+  //       lastName: values.lastName,
+  //       email: values.email,
+  //       phone: values.phone,
+  //       quantity: parseInt(values.quantity),
+  //       price: total,
+  //       eventName: event.title,
+  //       eventId: event.id,
+  //       orderId: orderId,
+  //     };
+
+  //     const response = await fetch("/api/transaction", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(transactionPayload),
+  //     });
+
+  //     if (!response.ok) throw new Error("Failed to create transaction");
+  //     const data: { token: string } = await response.json();
+
+  //     // Create ticket immediately (status: waiting_payment)
+  //     const initialFormData = new FormData();
+  //     initialFormData.append("eventId", event.id);
+  //     initialFormData.append("quantity", values.quantity);
+  //     initialFormData.append("price", total.toString());
+  //     initialFormData.append("userId", user.uid);
+  //     initialFormData.append(
+  //       "customerName",
+  //       `${values.firstName} ${values.lastName}`
+  //     );
+  //     initialFormData.append("venue", event.venue);
+  //     initialFormData.append("status", "waiting_payment");
+  //     initialFormData.append("orderId", orderId);
+
+  //     const ticketResult = await processTicketPurchase(initialFormData);
+  //     if (!ticketResult.success || !ticketResult.ticketId) {
+  //       throw new Error("Failed to create ticket before payment.");
+  //     }
+
+  //     ticketId = ticketResult.ticketId;
+  //     setIsLoadingPayment(true);
+
+  //     const snap = (window as any).snap;
+
+  //     await new Promise<void>((resolve) => {
+  //       snap?.pay(data.token, {
+  //         onSuccess: async () => {
+  //           if (ticketId) {
+  //             await updateTicketStatus(ticketId, "confirmed");
+  //           }
+  //           toast({
+  //             title: "Payment successful",
+  //             description: "You can view your ticket on My Ticket page.",
+  //           });
+  //           router.push(`/payment-success?ticketId=${ticketId}`);
+  //           resolve();
+  //         },
+
+  //         onPending: async () => {
+  //           if (didReserve) {
+  //             await releaseTicketsByOrderId(orderId);
+  //           }
+  //           if (ticketId) {
+  //             await updateTicketStatus(ticketId, "Pending");
+  //           }
+  //           toast({
+  //             title: "Payment pending",
+  //             description: "Please complete the payment from your bank app.",
+  //           });
+  //           resolve();
+  //         },
+
+  //         onError: async () => {
+  //           if (didReserve) {
+  //             await releaseTicketsByOrderId(orderId);
+  //           }
+  //           if (ticketId) {
+  //             await updateTicketStatus(ticketId, "cancelled");
+  //           }
+  //           toast({
+  //             variant: "destructive",
+  //             title: "Payment failed",
+  //             description: "An error occurred during payment.",
+  //           });
+  //           resolve();
+  //         },
+
+  //         onClose: async () => {
+  //           if (didReserve) {
+  //             await releaseTicketsByOrderId(orderId);
+  //           }
+  //           if (ticketId) {
+  //             await updateTicketStatus(ticketId, "cancelled");
+  //           }
+  //           toast({
+  //             title: "Payment cancelled",
+  //             description:
+  //               "You closed the payment popup. No ticket was created.",
+  //           });
+  //           resolve();
+  //         },
+  //       });
+  //     });
+  //   } catch (err) {
+  //     if (didReserve) {
+  //       await releaseTicketsByOrderId(orderId);
+  //     }
+
+  //     if (err instanceof Error) {
+  //       if (err.message.includes("Tickets are sold out")) {
+  //         toast({
+  //           variant: "destructive",
+  //           title: "Tickets Unavailable",
+  //           description:
+  //             "The tickets have been sold out or held by other users. Please try another event.",
+  //         });
+  //         router.push("/");
+  //         return;
+  //       }
+
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Ticket Reservation Failed",
+  //         description:
+  //           err.message || "An error occurred while reserving your tickets.",
+  //       });
+  //     } else {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Ticket Reservation Failed",
+  //         description:
+  //           "An unknown error occurred while reserving your tickets.",
+  //       });
+  //     }
+  //     return;
+  //   } finally {
+  //     setIsLoading(false);
+  //     setIsLoadingPayment(false);
+  //     setDisabledTimeLeft(COUNTDOWN_SECONDS);
+  //   }
+  // }
 
   const COUNTDOWN_SECONDS = 180; // 3 menit
   const [disabledTimeLeft, setDisabledTimeLeft] = useState(0);
