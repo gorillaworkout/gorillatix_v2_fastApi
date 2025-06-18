@@ -245,7 +245,7 @@ export default function OrdersPage() {
                             </div>
                           </div>
                           <div className="flex items-center justify-end gap-2">
-                            {ticket.status === "confirmed" && (
+                            {ticket.status === "confirmed" || ticket.status === "paid" && (
                               <>
                               <Button
                                 variant="outline"
