@@ -56,9 +56,6 @@ export default function EventPage() {
             setIsDisabled(isBeforeSelling || isAfterSelling)
             setStart(start)
             setEvent(foundEvent);
-            console.log(now)
-            console.log(start)
-            console.log(end)
           } else {
             // If not found in context, try to fetch it
             const fetchedEvent = await getEventBySlug(slug);
@@ -305,7 +302,7 @@ export default function EventPage() {
                     eventId={event.id}
                     timeSelling={event.timeSelling}
                   /> */}
-                    <Link href={`/event/${event.slug}`} className="w-full">
+                    <Link href={`/checkout?eventId=${event.id}`} className="w-full">
                       {isBeforeSelling ? (
                         <Button disabled className="w-full cursor-not-allowed opacity-80">
                           Tickets available {start?.toFormat("dd MMM yyyy, HH:mm")}
