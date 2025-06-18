@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createTicket } from "@/lib/firebase-service";
 import { useState } from "react";
+import router from "next/router";
 
 const manualTicketSchema = z.object({
   customerName: z.string().min(1),
@@ -23,11 +24,16 @@ const manualTicketSchema = z.object({
 type ManualTicketFormValues = z.infer<typeof manualTicketSchema>;
 
 export default function ManualTicketPage() {
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ManualTicketFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ManualTicketFormValues>({
     resolver: zodResolver(manualTicketSchema),
     defaultValues: {
       status: "confirmed",
-    }
+    },
   });
 
   const { toast } = useToast();
@@ -67,10 +73,21 @@ export default function ManualTicketPage() {
         <Input {...register("eventId")} placeholder="Event ID" />
         <Input {...register("eventName")} placeholder="Event Name" />
         <Input {...register("venue")} placeholder="Venue" />
-        <Input {...register("quantity", { valueAsNumber: true })} placeholder="Quantity" type="number" />
-        <Input {...register("totalPrice", { valueAsNumber: true })} placeholder="Total Price (Rp)" type="number" />
+        <Input
+          {...register("quantity", { valueAsNumber: true })}
+          placeholder="Quantity"
+          type="number"
+        />
+        <Input
+          {...register("totalPrice", { valueAsNumber: true })}
+          placeholder="Total Price (Rp)"
+          type="number"
+        />
         <Input {...register("orderId")} placeholder="Order ID" />
-        <select {...register("status")} className="w-full border px-3 py-2 rounded-md">
+        <select
+          {...register("status")}
+          className="w-full border px-3 py-2 rounded-md"
+        >
           <option value="confirmed">Confirmed</option>
           <option value="pending">Pending</option>
           <option value="expired">Expired</option>
@@ -78,6 +95,14 @@ export default function ManualTicketPage() {
 
         <Button type="submit" disabled={loading || isSubmitting}>
           {loading ? "Saving..." : "Create Ticket"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={() => router.back()}
+        >
+          Cancel
         </Button>
       </form>
     </div>
