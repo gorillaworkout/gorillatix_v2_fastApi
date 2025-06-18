@@ -128,6 +128,18 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Pay Account notification error:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  } finally {
+    try {
+      const body = await req.json();
+      const logRef = db.collection("midtrans_logs").doc(); // auto ID
+      await logRef.set({
+        receivedAt: new Date(),
+        body: typeof body === "object" ? body : {},
+      });
+      console.log("Logged Midtrans body to Firestore.");
+    } catch (logError) {
+      console.error("Failed to log Midtrans body:", logError);
+    }
   }
 }
 
