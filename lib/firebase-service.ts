@@ -356,19 +356,19 @@ export async function getTicketById(id: string) {
   }
 }
 
-export async function updateTicketStatus(
-  id: string,
-  status: StatusTicketProps
-) {
-  try {
-    const docRef = doc(ticketsCollection, id);
-    await updateDoc(docRef, { status });
-    return true;
-  } catch (error) {
-    console.error("Error updating ticket status:", error);
-    throw error;
-  }
-}
+// export async function updateTicketStatus(
+//   id: string,
+//   status: StatusTicketProps
+// ) {
+//   try {
+//     const docRef = doc(ticketsCollection, id);
+//     await updateDoc(docRef, { status });
+//     return true;
+//   } catch (error) {
+//     console.error("Error updating ticket status:", error);
+//     throw error;
+//   }
+// }
 
 // Get upcoming events
 export async function getUpcomingEvents(limitCount = 10) {
@@ -475,4 +475,18 @@ export async function releaseTickets(eventId: string, quantity: number) {
       ticketsAvailable: currentStock + quantity,
     });
   });
+}
+
+
+
+// 🔧 helper: update ticket status
+export async function updateTicketStatus(ticketId: string, status: string) {
+  const ticketRef = doc(db, "tickets", ticketId);
+
+  try {
+    await updateDoc(ticketRef, { status });
+  } catch (error) {
+    console.error("Failed to update ticket status:", error);
+    throw new Error("Unable to update ticket status");
+  }
 }

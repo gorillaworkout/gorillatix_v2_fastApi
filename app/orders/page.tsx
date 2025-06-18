@@ -245,21 +245,25 @@ export default function OrdersPage() {
                             </div>
                           </div>
                           <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDownloadTicket(ticket)}
-                            >
-                              <Download className="mr-2 h-4 w-4" />
-                              Download
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => handleViewTicket(ticket)}
-                            >
-                              <Ticket className="mr-2 h-4 w-4" />
-                              View Tickets
-                            </Button>
+                            {ticket.status === "confirmed" && (
+                              <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDownloadTicket(ticket)}
+                              >
+                                <Download className="mr-2 h-4 w-4" />
+                                Download
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleViewTicket(ticket)}
+                              >
+                                <Ticket className="mr-2 h-4 w-4" />
+                                View Tickets
+                              </Button>
+                              </>
+                            )}
                           </div>
                         </div>
                         <HiddenTicketDownload ticket={ticket} event={event} />
