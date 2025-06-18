@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   const parameter = {
     transaction_details: {
-      order_id: `ORDER-${Date.now()}`,
+      order_id: body.orderId,
       gross_amount: grossAmount,
     },
     customer_details: {
@@ -34,12 +34,12 @@ export async function POST(req: NextRequest) {
     item_details: [
       {
         id: "TICKET",
-        name: `${body.title} - ${body.firstName} ${body.lastName}`,
+        name: `${body.eventName} - ${body.firstName} ${body.lastName}`,
         quantity: quantity,
         price: price, // ❗ Ensure this is a number
       },
     ],
-  };
+  };  
 
   try {
     const transaction = await snap.createTransaction(parameter);

@@ -42,6 +42,9 @@ import { formatRupiah, formatTime } from "@/lib/utils";
 import Loader from "@/components/loading";
 import { EventItem } from "@/types/event";
 import { releaseTickets, reserveTickets, updateTicketStatus } from "@/lib/firebase-service";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import midtransClient from "midtrans-client";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "First name is required" }),
@@ -322,16 +325,37 @@ export default function CheckoutClient({
     await reserveTickets(event.id, parseInt(values.quantity));
     didReserve = true;
 
-    // Create transaction first
-    const transactionPayload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phone: values.phone,
-      quantity: parseInt(values.quantity),
-      price: total,
-      eventName: event.title,
-    };
+       // 🔍 Get total existing tickets for the event
+      let ticketCount = 0;
+      try {
+        const q = query(
+          collection(db, "tickets"),
+          where("eventId", "==", event.id)
+        );
+        const snapshot = await getDocs(q);
+        ticketCount = snapshot.size;
+      } catch (err) {
+        console.error("Failed to count tickets:", err);
+        return new Response("Failed to generate order ID", { status: 500 });
+      }
+
+        // 🆔 Generate unique order ID
+      const orderNumber = ticketCount + 1;
+      const eventSlug = event.title.trim().replace(/\s+/g, "-");
+      const orderId = `ORDER-${eventSlug}-${values.firstName}-${orderNumber}`;  
+      console.log(orderId, 'order ID')
+      // Create transaction first
+      const transactionPayload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        quantity: parseInt(values.quantity),
+        price: total,
+        eventName: event.title,
+        eventId: event.id,
+        orderId: orderId
+      };
 
     const response = await fetch("/api/transaction", {
       method: "POST",
@@ -354,6 +378,7 @@ export default function CheckoutClient({
     );
     initialFormData.append("venue", event.venue);
     initialFormData.append("status", "waiting_payment");
+    initialFormData.append("orderId", orderId);
 
     const ticketResult = await processTicketPurchase(initialFormData);
     if (!ticketResult.success || !ticketResult.ticketId) {

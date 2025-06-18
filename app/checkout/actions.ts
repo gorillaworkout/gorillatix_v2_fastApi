@@ -10,6 +10,7 @@ export async function processTicketPurchase(formData: FormData) {
     const customerName = formData.get("customerName") as string
     const venue = formData.get("venue") as string
     const status = formData.get("status") as "confirmed" | "cancelled" | "used"
+    const orderId = formData.get("orderId") as string
     // console.log("Processing ticket purchase:", { eventId, quantity, price, userId })
 
     if (!eventId || isNaN(quantity) || isNaN(price)) {
@@ -32,7 +33,7 @@ export async function processTicketPurchase(formData: FormData) {
 
     // Purchase ticket
     // console.log("Purchasing ticket with userId:", userId)
-    const ticket = await purchaseTicket(eventId, quantity, price, userId, customerName, venue, status)
+    const ticket = await purchaseTicket(eventId, quantity, price, userId, customerName, venue, status, orderId)
 
     if (ticket) {
       // console.log("Ticket purchased successfully:", ticket)

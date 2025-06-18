@@ -269,7 +269,8 @@ export async function purchaseTicket(
   userId: string,
   customerName: string,
   venue: string,
-  status: StatusTicketProps
+  status: StatusTicketProps,
+  orderId: string
 ) {
   try {
     if (
@@ -299,6 +300,7 @@ export async function purchaseTicket(
         status,
         eventName: eventData.title,
         customerName,
+        orderId
       };
 
       // ✅ Jangan kurangi ticketsAvailable lagi

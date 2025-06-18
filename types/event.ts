@@ -79,6 +79,7 @@ export interface TicketProps {
   status: StatusTicketProps
   eventName: string
   customerName: string
+  orderId?: string
 }
 
 // export interface Ticket {
