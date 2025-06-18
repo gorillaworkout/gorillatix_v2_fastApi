@@ -465,13 +465,59 @@ export async function reserveTickets(eventId: string, quantity: number) {
 }
 
 // Fungsi untuk rollback tiket (kembalikan stok)
-export async function releaseTickets(eventId: string, quantity: number) {
-  const eventRef = doc(db, "events", eventId);
-  await runTransaction(db, async (transaction) => {
-    const eventDoc = await transaction.get(eventRef);
-    if (!eventDoc.exists()) throw new Error("Event not found");
+// export async function releaseTickets(eventId: string, quantity: number) {
+//   const eventRef = doc(db, "events", eventId);
+//   await runTransaction(db, async (transaction) => {
+//     const eventDoc = await transaction.get(eventRef);
+//     if (!eventDoc.exists()) throw new Error("Event not found");
 
-    const currentStock = eventDoc.data().ticketsAvailable;
+//     const currentStock = eventDoc.data().ticketsAvailable;
+
+//     transaction.update(eventRef, {
+//       ticketsAvailable: currentStock + quantity,
+//     });
+//   });
+// }
+type TicketData = {
+  eventId: string;
+  quantity: number;
+};
+export async function releaseTicketsByOrderId(orderId: string) {
+  // 1. Cari tiket berdasarkan field orderId
+  const ticketsRef = collection(db, "tickets");
+  const q = query(ticketsRef, where("orderId", "==", orderId));
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) {
+    throw new Error("Ticket not found for orderId: " + orderId);
+  }
+
+  const ticketSnap = querySnapshot.docs[0]; // ambil 1 dokumen saja
+  const ticketData = ticketSnap.data() as TicketData;
+
+  const { eventId, quantity } = ticketData;
+
+  if (!eventId || typeof quantity !== "number") {
+    throw new Error("Missing or invalid eventId or quantity in ticket data");
+  }
+
+  const eventRef = doc(db, "events", eventId);
+
+  // 2. Jalankan transaksi untuk mengembalikan tiket
+  await runTransaction(db, async (transaction) => {
+    const eventSnap = await transaction.get(eventRef);
+    if (!eventSnap.exists) {
+      throw new Error("Event not found");
+    }
+
+    const eventData = eventSnap.data();
+    const currentStock = eventData?.ticketsAvailable ?? 0;
+
+    console.log(
+      currentStock,
+      "current ticketsAvailable — will add back",
+      quantity
+    );
 
     transaction.update(eventRef, {
       ticketsAvailable: currentStock + quantity,
