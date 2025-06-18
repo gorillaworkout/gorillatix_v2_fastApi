@@ -17,6 +17,8 @@ import LocationSection from "./../../../components/locatioSection";
 import { useRouter } from "next/navigation";
 import { ShareEventSection } from "@/components/share-event-section";
 import { TicketButton } from "@/components/ticket-button";
+import { set } from "date-fns";
+import { DateTime } from "luxon";
 
 export default function EventPage() {
   const params = useParams();
@@ -25,6 +27,10 @@ export default function EventPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isBeforeSelling, setIsBeforeSelling] = useState<boolean>(false)
+  const [isAfterSelling, setIsAfterSelling] = useState<boolean>(false)
+  const [isDisabled, setIsDisabled] = useState<boolean>(false)
+  const [start, setStart] = useState<DateTime<true> | DateTime<false>>()
   useEffect(() => {
     async function fetchEvent() {
       if (params.slug) {
@@ -34,7 +40,25 @@ export default function EventPage() {
           const foundEvent = events.find((e) => e.slug === slug);
 
           if (foundEvent) {
+              const now = DateTime.now().setZone("Asia/Jakarta");
+            
+              const start = DateTime.fromFormat(
+                `${foundEvent.startSellingDate} ${foundEvent.timeSelling}`,
+                "yyyy-MM-dd HH:mm",
+                { zone: "Asia/Jakarta" }
+              );
+            
+              const end = DateTime.fromFormat(foundEvent.endSellingDate, "yyyy-MM-dd", {
+                zone: "Asia/Jakarta",
+              }).endOf("day");
+            setIsBeforeSelling(now < start)
+            setIsAfterSelling(now > end)
+            setIsDisabled(isBeforeSelling || isAfterSelling)
+            setStart(start)
             setEvent(foundEvent);
+            console.log(now)
+            console.log(start)
+            console.log(end)
           } else {
             // If not found in context, try to fetch it
             const fetchedEvent = await getEventBySlug(slug);
@@ -272,16 +296,30 @@ export default function EventPage() {
                       {event.ticketsAvailable > 0 ? "Buy Tickets" : "Sold Out"}
                     </Link>
                   </Button> */}
-                  <TicketButton
+                  {/* <TicketButton
                     slug={event.slug}
                     startSellingDate={event.startSellingDate}
                     endSellingDate={event.endSellingDate}
                     ticketsAvailable={event.ticketsAvailable}
                     status={event.status}
                     eventId={event.id}
-                    
-                  />
-
+                    timeSelling={event.timeSelling}
+                  /> */}
+                    <Link href={`/event/${event.slug}`} className="w-full">
+                      {isBeforeSelling ? (
+                        <Button disabled className="w-full cursor-not-allowed opacity-80">
+                          Tickets available {start?.toFormat("dd MMM yyyy, HH:mm")}
+                        </Button>
+                      ) : isAfterSelling ? (
+                        <Button disabled className="w-full cursor-not-allowed opacity-80">
+                          This event has ended
+                        </Button>
+                      ) : (
+                        <Button className="w-full">
+                          {event.ticketsAvailable > 0 ? "Buy Tickets" : "View Details"}
+                        </Button>
+                      )}
+                    </Link>
 
                   <p className="text-xs text-center text-muted-foreground mt-2">
                     Secure checkout powered by Midtrans

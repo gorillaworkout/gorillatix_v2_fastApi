@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import { DateTime } from "luxon";
 
 interface TicketButtonProps {
   slug: string;
@@ -9,6 +10,7 @@ interface TicketButtonProps {
   ticketsAvailable: number;
   status: string; // optional
   eventId: string;
+  timeSelling:string;
 }
 
 export function TicketButton({
@@ -18,20 +20,26 @@ export function TicketButton({
   ticketsAvailable,
   status,
   eventId,
+  timeSelling = "00:00",
 }: TicketButtonProps) {
-  const today = new Date();
-  const start = new Date(startSellingDate);
-  const end = new Date(endSellingDate);
+   const now = DateTime.now().setZone("Asia/Jakarta");
+ 
+   const start = DateTime.fromFormat(
+     `${startSellingDate} ${timeSelling}`,
+     "yyyy-MM-dd HH:mm",
+     { zone: "Asia/Jakarta" }
+   );
+ 
+   const end = DateTime.fromFormat(endSellingDate, "yyyy-MM-dd", {
+     zone: "Asia/Jakarta",
+   }).endOf("day");
+ 
 
-  today.setHours(0, 0, 0, 0);
-  start.setHours(0, 0, 0, 0);
-  end.setHours(0, 0, 0, 0);
-
-  const isBeforeSelling = today < start;
-  const isAfterSelling = today > end;
+  const isBeforeSelling = now < start;
+  const isAfterSelling = now > end;
   const isInactive = status !== "Active";
   const isSoldOut = ticketsAvailable <= 0;
-
+  
   if (isBeforeSelling) {
     return (
       <Button disabled className="w-full mt-4 cursor-not-allowed opacity-80">

@@ -81,7 +81,7 @@ export default function OrdersPage() {
           }
           setTicketEvents(events);
         } catch (err: any) {
-          console.error("Error loading tickets:", err);
+          // console.error("Error loading tickets:", err);
 
           // Check if it's an index error
           if (err.message && err.message.includes("index")) {
