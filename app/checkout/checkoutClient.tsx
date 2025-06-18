@@ -163,6 +163,7 @@ export default function CheckoutClient({
         phone: values.phone,
         quantity: parseInt(values.quantity),
         price: total,
+        eventName:event.title
       };
 
       const response = await fetch("/api/transaction", {

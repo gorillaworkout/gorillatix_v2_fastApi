@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     item_details: [
       {
         id: "TICKET",
-        name: `Event Ticket - ${body.firstName} ${body.lastName}`,
+        name: `${body.title} - ${body.firstName} ${body.lastName}`,
         quantity: quantity,
         price: price, // ❗ Ensure this is a number
       },
