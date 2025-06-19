@@ -183,9 +183,8 @@ export default function EventPage() {
                   alt={event.title}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 800px"
-                  className={`object-cover transition-opacity duration-500 ${
-                    imageLoaded ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`object-cover transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"
+                    }`}
                   onLoad={() => setImageLoaded(true)}
                   priority
                 />
@@ -274,7 +273,7 @@ export default function EventPage() {
                     <span>
                       {event.ticketsAvailable > 0
                         ? `${event.ticketsAvailable} tickets left`
-                        : "Sold Out"}
+                        : "Out of Stock"}
                     </span>
                   </div>
 
@@ -307,35 +306,40 @@ export default function EventPage() {
                     timeSelling={event.timeSelling}
                   /> */}
 
-                    {isBeforeSelling ? (
-                      <>
-                        {" "}
-                        <Button
-                          disabled
-                          className="w-full cursor-not-allowed opacity-80"
-                        >
-                          Tickets available{" "}
-                          {start?.toFormat("dd MMM yyyy, HH:mm")}
-                        </Button>
-                      </>
-                    ) : isAfterSelling ? (
-                      <>
-                        <Button
-                          disabled
-                          className="w-full cursor-not-allowed opacity-80"
-                        >
-                          This event has ended
-                        </Button>
-                      </>
-                    ) : (
+                  {isBeforeSelling ? (
+                    <>
+                      {" "}
+                      <Button
+                        disabled
+                        className="w-full cursor-not-allowed opacity-80"
+                      >
+                        Tickets available{" "}
+                        {start?.toFormat("dd MMM yyyy, HH:mm")}
+                      </Button>
+                    </>
+                  ) : isAfterSelling ? (
+                    <>
+                      <Button
+                        disabled
+                        className="w-full cursor-not-allowed opacity-80"
+                      >
+                        This event has ended
+                      </Button>
+                    </>
+                  ) : event.ticketsAvailable > 0 ?
+                    <>
                       <Link href={`/checkout?eventId=${event.id}`}
-                    className="w-full">
+                        className="w-full">
                         <Button className="w-full">
-                          {event.ticketsAvailable > 0
-                            ? "Buy Tickets"
-                            : "View Details"}
+                          Buy Tickets
                         </Button>
                       </Link>
+                    </>
+                    :
+                    (
+                      <Button disabled className="w-full cursor-not-allowed opacity-80" >
+                        Out of Stock
+                      </Button>
                     )}
 
                   <p className="text-xs text-center text-muted-foreground mt-2">

@@ -296,7 +296,7 @@ export async function purchaseTicket(
         eventId,
         userId,
         quantity,
-        totalPrice: price * quantity,
+        totalPrice: price,
         purchaseDate: Timestamp.now(),
         venue,
         status,
