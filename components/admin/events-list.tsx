@@ -74,6 +74,7 @@ const handleDownloadReport = async (eventId: string) => {
       return {
         "Customer Name": data.customerName,
         "User ID": data.userId,
+        "Order ID": data.orderId,
         "Event Name": data.eventName,
         "Purchase Date": data.purchaseDate.toDate().toLocaleString(),
         "Quantity": data.quantity,

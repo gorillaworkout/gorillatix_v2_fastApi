@@ -112,69 +112,68 @@ export async function getRecentSales(limitCount = 5): Promise<RecentSale[]> {
 // Get total revenue
 export async function getTotalRevenue(): Promise<{ total: number; percentChange: number }> {
   try {
-    const ticketsCollection = collection(db, "tickets")
+    const ticketsCollection = collection(db, "tickets");
 
-    // Get current month data
-    const currentDate = new Date()
-    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59)
+    // Current month
+    const currentDate = new Date();
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
 
     const currentMonthQuery = query(
       ticketsCollection,
       where("purchaseDate", ">=", Timestamp.fromDate(startOfMonth)),
-      where("purchaseDate", "<=", Timestamp.fromDate(endOfMonth)),
-    )
+      where("purchaseDate", "<=", Timestamp.fromDate(endOfMonth))
+    );
 
-    // Get previous month data
-    const startOfPrevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    const endOfPrevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0, 23, 59, 59)
+    // Previous month
+    const startOfPrevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+    const endOfPrevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0, 23, 59, 59);
 
     const prevMonthQuery = query(
       ticketsCollection,
       where("purchaseDate", ">=", Timestamp.fromDate(startOfPrevMonth)),
-      where("purchaseDate", "<=", Timestamp.fromDate(endOfPrevMonth)),
-    )
+      where("purchaseDate", "<=", Timestamp.fromDate(endOfPrevMonth))
+    );
 
-    // Execute queries
+    // Execute both queries
     const [currentMonthSnapshot, prevMonthSnapshot] = await Promise.all([
       getDocs(currentMonthQuery),
       getDocs(prevMonthQuery),
-    ])
+    ]);
 
-    // Calculate totals
-    let currentMonthTotal = 0
-    let prevMonthTotal = 0
+    // Sum helper
+    const getSafeTotal = (snapshot: any) => {
+      let total = 0;
+      snapshot.forEach((doc: any) => {
+        const raw = doc.data().totalPrice;
+        const price = Number(raw);
+        if (!isNaN(price)) {
+          total += price;
+        }
+      });
+      return total;
+    };
 
-    currentMonthSnapshot.forEach((doc) => {
-      currentMonthTotal += doc.data().totalPrice || 0
-    })
+    const currentMonthTotal = getSafeTotal(currentMonthSnapshot);
+    const prevMonthTotal = getSafeTotal(prevMonthSnapshot);
 
-    prevMonthSnapshot.forEach((doc) => {
-      prevMonthTotal += doc.data().totalPrice || 0
-    })
-
-    // Calculate percentage change
+    // Calculate percent change
     const percentChange =
       prevMonthTotal === 0
-        ? 100 // If previous month was 0, consider it 100% increase
-        : ((currentMonthTotal - prevMonthTotal) / prevMonthTotal) * 100
+        ? 100
+        : ((currentMonthTotal - prevMonthTotal) / prevMonthTotal) * 100;
 
-    // Get all-time total
-    const allTicketsQuery = query(ticketsCollection)
-    const allTicketsSnapshot = await getDocs(allTicketsQuery)
-
-    let totalRevenue = 0
-    allTicketsSnapshot.forEach((doc) => {
-      totalRevenue += doc.data().totalPrice || 0
-    })
+    // All-time total revenue
+    const allTicketsSnapshot = await getDocs(ticketsCollection);
+    const totalRevenue = getSafeTotal(allTicketsSnapshot);
 
     return {
       total: totalRevenue,
       percentChange,
-    }
+    };
   } catch (error) {
-    console.error("Error getting total revenue:", error)
-    return { total: 0, percentChange: 0 }
+    console.error("Error getting total revenue:", error);
+    return { total: 0, percentChange: 0 };
   }
 }
 
