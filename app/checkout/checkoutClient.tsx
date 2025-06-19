@@ -43,9 +43,7 @@ import Loader from "@/components/loading";
 import { EventItem } from "@/types/event";
 import {
   releaseTickets,
-  releaseTicketsByOrderId,
   reserveTickets,
-  updateTicketStatus,
 } from "@/lib/firebase-service";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -76,7 +74,7 @@ export default function CheckoutClient({
   const { toast } = useToast();
   const { getEventById } = useEvents();
   const { user, loading: authLoading } = useAuth();
-  const maxQuantity = event ? Math.min(event.ticketsAvailable, 5) : 1;
+  const maxQuantity = event ? Math.min(event.ticketsAvailable, 5) : 0;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -141,11 +139,11 @@ export default function CheckoutClient({
       lastName: user?.displayName?.split(" ")[1] || "",
       email: user?.email || "",
       phone: "",
-      quantity: "1",
+      quantity: "0",
     },
   });
 
-  const quantity = Number.parseInt(form.watch("quantity") || "1");
+  const quantity = Number.parseInt(form.watch("quantity") || "0");
   const subtotal = event && event.price ? event.price * quantity : 0;
   const fees = Math.ceil(subtotal * 0.02);
   const serviceCharge = 5000;
@@ -331,185 +329,6 @@ export default function CheckoutClient({
     }
   }
 
-  // countdown button 3 minutes
-
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
-  //   if (!event || !user) return;
-
-  //   setIsLoading(true);
-  //   setError(null);
-  //   let didReserve = false;
-  //   let ticketId: string | null = null;
-
-  // let ticketCount = 0;
-  // try {
-  //   const q = query(
-  //     collection(db, "tickets"),
-  //     where("eventId", "==", event.id)
-  //   );
-  //   const snapshot = await getDocs(q);
-  //   ticketCount = snapshot.size;
-  // } catch (err) {
-  //   console.error("Failed to count tickets:", err);
-  //   return new Response("Failed to generate order ID", { status: 500 });
-  // }
-
-  // // 🆔 Generate unique order ID
-  // const orderNumber = ticketCount + 1;
-  // const eventSlug = event.title.trim().replace(/\s+/g, "-");
-  // const orderId = `ORDER-${eventSlug}-${values.firstName}-${orderNumber}`;
-  // console.log(orderId, "order ID");
-  //   try {
-  //     // Reserve tickets
-  //     await reserveTickets(event.id, parseInt(values.quantity));
-  //     didReserve = true;
-
-  //     // 🔍 Get total existing tickets for the event
-
-  //     // Create transaction first
-  //     const transactionPayload = {
-  //       firstName: values.firstName,
-  //       lastName: values.lastName,
-  //       email: values.email,
-  //       phone: values.phone,
-  //       quantity: parseInt(values.quantity),
-  //       price: total,
-  //       eventName: event.title,
-  //       eventId: event.id,
-  //       orderId: orderId,
-  //     };
-
-  //     const response = await fetch("/api/transaction", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(transactionPayload),
-  //     });
-
-  //     if (!response.ok) throw new Error("Failed to create transaction");
-  //     const data: { token: string } = await response.json();
-
-  //     // Create ticket immediately (status: waiting_payment)
-  //     const initialFormData = new FormData();
-  //     initialFormData.append("eventId", event.id);
-  //     initialFormData.append("quantity", values.quantity);
-  //     initialFormData.append("price", total.toString());
-  //     initialFormData.append("userId", user.uid);
-  //     initialFormData.append(
-  //       "customerName",
-  //       `${values.firstName} ${values.lastName}`
-  //     );
-  //     initialFormData.append("venue", event.venue);
-  //     initialFormData.append("status", "waiting_payment");
-  //     initialFormData.append("orderId", orderId);
-
-  //     const ticketResult = await processTicketPurchase(initialFormData);
-  //     if (!ticketResult.success || !ticketResult.ticketId) {
-  //       throw new Error("Failed to create ticket before payment.");
-  //     }
-
-  //     ticketId = ticketResult.ticketId;
-  //     setIsLoadingPayment(true);
-
-  //     const snap = (window as any).snap;
-
-  //     await new Promise<void>((resolve) => {
-  //       snap?.pay(data.token, {
-  //         onSuccess: async () => {
-  //           if (ticketId) {
-  //             await updateTicketStatus(ticketId, "confirmed");
-  //           }
-  //           toast({
-  //             title: "Payment successful",
-  //             description: "You can view your ticket on My Ticket page.",
-  //           });
-  //           router.push(`/payment-success?ticketId=${ticketId}`);
-  //           resolve();
-  //         },
-
-  //         onPending: async () => {
-  //           if (didReserve) {
-  //             await releaseTicketsByOrderId(orderId);
-  //           }
-  //           if (ticketId) {
-  //             await updateTicketStatus(ticketId, "Pending");
-  //           }
-  //           toast({
-  //             title: "Payment pending",
-  //             description: "Please complete the payment from your bank app.",
-  //           });
-  //           resolve();
-  //         },
-
-  //         onError: async () => {
-  //           if (didReserve) {
-  //             await releaseTicketsByOrderId(orderId);
-  //           }
-  //           if (ticketId) {
-  //             await updateTicketStatus(ticketId, "cancelled");
-  //           }
-  //           toast({
-  //             variant: "destructive",
-  //             title: "Payment failed",
-  //             description: "An error occurred during payment.",
-  //           });
-  //           resolve();
-  //         },
-
-  //         onClose: async () => {
-  //           if (didReserve) {
-  //             await releaseTicketsByOrderId(orderId);
-  //           }
-  //           if (ticketId) {
-  //             await updateTicketStatus(ticketId, "cancelled");
-  //           }
-  //           toast({
-  //             title: "Payment cancelled",
-  //             description:
-  //               "You closed the payment popup. No ticket was created.",
-  //           });
-  //           resolve();
-  //         },
-  //       });
-  //     });
-  //   } catch (err) {
-  //     if (didReserve) {
-  //       await releaseTicketsByOrderId(orderId);
-  //     }
-
-  //     if (err instanceof Error) {
-  //       if (err.message.includes("Tickets are sold out")) {
-  //         toast({
-  //           variant: "destructive",
-  //           title: "Tickets Unavailable",
-  //           description:
-  //             "The tickets have been sold out or held by other users. Please try another event.",
-  //         });
-  //         router.push("/");
-  //         return;
-  //       }
-
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Ticket Reservation Failed",
-  //         description:
-  //           err.message || "An error occurred while reserving your tickets.",
-  //       });
-  //     } else {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Ticket Reservation Failed",
-  //         description:
-  //           "An unknown error occurred while reserving your tickets.",
-  //       });
-  //     }
-  //     return;
-  //   } finally {
-  //     setIsLoading(false);
-  //     setIsLoadingPayment(false);
-  //     setDisabledTimeLeft(COUNTDOWN_SECONDS);
-  //   }
-  // }
 
   const COUNTDOWN_SECONDS = 180; // 3 menit
   const [disabledTimeLeft, setDisabledTimeLeft] = useState(0);
@@ -671,19 +490,9 @@ export default function CheckoutClient({
                   )}
                 />
               </div>
-
-              {/* <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2"
-              >
-                {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                <CreditCard className="h-5 w-5" />
-                Pay Now
-              </Button> */}
               <Button
                 type="submit"
-                disabled={isLoading || disabledTimeLeft > 0}
+                disabled={isLoading || disabledTimeLeft > 0 || quantity <= 0}
                 className="w-full flex items-center justify-center gap-2"
               >
                 {(isLoading || disabledTimeLeft > 0) && (
@@ -695,9 +504,11 @@ export default function CheckoutClient({
                   <CreditCard className="h-5 w-5" />
                 )}
 
-                {disabledTimeLeft > 0
+                 {disabledTimeLeft > 0
                   ? `Please wait ${formatTime(disabledTimeLeft)}`
-                  : "Pay Now"}
+                  : quantity <= 0
+                  ? "Out of stock"
+                  : `Pay Now ${quantity}`}
               </Button>
             </form>
           </Form>
