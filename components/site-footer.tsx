@@ -65,7 +65,7 @@ export function SiteFooter() {
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2 text-sm">
               <li className="text-muted-foreground">Email: gorillatix@gmail.com</li>
-              <li className="text-muted-foreground">Phone: +62 851-3352-4900</li>
+              <li className="text-muted-foreground">Phone: +62 877 005 002 08</li>
               <li className="text-muted-foreground">Address: Jl. Gatot Subroto No. 999, Jakarta, Indonesia</li>
             </ul>
           </div>

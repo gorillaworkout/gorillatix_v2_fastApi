@@ -176,9 +176,10 @@ export default function CheckoutClient({
       }
 
       // 🆔 Generate unique order ID
-      const orderNumber = ticketCount + 1;
-      const eventSlug = event.title.trim().replace(/\s+/g, "-");
-      const orderId = `ORDER-${eventSlug}-${values.firstName}-${orderNumber}`;
+
+      const timestampSuffix = Date.now().toString().slice(-3); // last 3 digits of timestamp
+      const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random number (100–999)
+      const orderId = `ORDER-${values.firstName}-${timestampSuffix}${randomSuffix}`;
       console.log(orderId, "order ID");
 
       const transactionPayload = {
