@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     if (ticketsQuery.empty) {
       if (newStatus === "paid") {
         if (!customer_name || !event_id) {
-          console.warn("⚠️ Missing required data for ticket creation");
+          // console.warn("⚠️ Missing required data for ticket creation");
           return NextResponse.json({ message: "Missing ticket info" }, { status: 400 });
         }
 
@@ -118,9 +118,9 @@ export async function POST(req: NextRequest) {
           updatedAt: Timestamp.now(),
         });
 
-        console.log(`✅ Ticket created for paid order: ${order_id}`);
+        // console.log(`✅ Ticket created for paid order: ${order_id}`);
       } else {
-        console.warn(`⚠️ Ticket not found for order_id: ${order_id}`);
+        // console.warn(`⚠️ Ticket not found for order_id: ${order_id}`);
         return NextResponse.json({ message: "Ticket not found" }, { status: 404 });
       }
     } else {
@@ -135,9 +135,9 @@ export async function POST(req: NextRequest) {
           midtransStatus: verifiedStatus,
           updatedAt: Timestamp.now(),
         });
-        console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
+        // console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
       } else {
-        console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
+        // console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
       }
     }
 
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
     if (["pending", "expire", "cancel", "deny", "error"].includes(verifiedStatus)) {
       try {
         await releaseTicketsByOrderId(order_id);
-        console.log(`🔁 Tickets released for orderId: ${order_id}`);
+        // console.log(`🔁 Tickets released for orderId: ${order_id}`);
       } catch (err) {
         console.error("❌ Failed to release tickets:", err);
       }
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
         receivedAt: Timestamp.now(),
         body: typeof body === "object" ? body : {},
       });
-      console.log("📝 Logged Midtrans body to Firestore.");
+      // console.log("📝 Logged Midtrans body to Firestore.");
     } catch (logError) {
       console.error("❌ Failed to log Midtrans body:", logError);
     }

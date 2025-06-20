@@ -449,12 +449,6 @@ export async function releaseTicketsByOrderId(orderId: string) {
     const eventData = eventSnap.data();
     const currentStock = eventData?.ticketsAvailable ?? 0;
 
-    console.log(
-      currentStock,
-      "current ticketsAvailable — will add back",
-      quantity
-    );
-
     transaction.update(eventRef, {
       ticketsAvailable: currentStock + quantity,
     });
@@ -525,7 +519,6 @@ export async function createPendingTicket({
   venue: string;
   orderId: string;
 }) {
-  console.log("Creating pending ticket...", orderId, 'firebase-service.ts');
   return await addDoc(collection(db, "tickets"), {
     eventId,
     eventName,
@@ -559,7 +552,6 @@ export async function confirmPendingTicket(orderId: string) {
   const data = docSnap.data();
 
   if (data.status !== "pending") {
-    console.log(`Skipping confirm: ticket already ${data.status}`);
     return;
   }
 
@@ -568,5 +560,4 @@ export async function confirmPendingTicket(orderId: string) {
     updatedAt: Timestamp.now(),
   });
 
-  console.log("✅ Ticket confirmed for orderId:", orderId);
 }

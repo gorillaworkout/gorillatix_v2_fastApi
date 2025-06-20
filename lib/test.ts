@@ -293,9 +293,3 @@ function compareOrders(webData: string[], midtransData: string[]) {
 
 // Contoh penggunaan:
 const result = compareOrders(webData, midtransData);
-
-console.log("Orders missing in Midtrans (ada di webData tapi tidak ada di midtransData):", result.missingInMidtrans);
-console.log("Orders missing in WebData (ada di midtransData tapi tidak ada di webData):", result.missingInWebData);
-
-console.log("Total items in webData:", webData.length);
-console.log("Total items in midtransData:", midtransData.length);
