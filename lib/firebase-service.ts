@@ -525,6 +525,7 @@ export async function createPendingTicket({
   venue: string;
   orderId: string;
 }) {
+  console.log("Creating pending ticket...", orderId, 'firebase-service.ts');
   return await addDoc(collection(db, "tickets"), {
     eventId,
     eventName,
@@ -553,7 +554,14 @@ export async function confirmPendingTicket(orderId: string) {
     throw new Error("Ticket not found for orderId: " + orderId);
   }
 
-  const docRef = snapshot.docs[0].ref;
+  const docSnap = snapshot.docs[0];
+  const docRef = docSnap.ref;
+  const data = docSnap.data();
+
+  if (data.status !== "pending") {
+    console.log(`Skipping confirm: ticket already ${data.status}`);
+    return;
+  }
 
   await updateDoc(docRef, {
     status: "confirmed",

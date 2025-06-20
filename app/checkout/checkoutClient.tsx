@@ -167,22 +167,6 @@ export default function CheckoutClient({
     try {
       await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
       didReserve = true;
-      let ticketCount = 0;
-      try {
-        const q = query(
-          collection(db, "tickets"),
-          where("eventId", "==", event.id)
-        );
-        const snapshot = await getDocs(q);
-        ticketCount = snapshot.size;
-      } catch (err) {
-        console.error("Failed to count tickets:", err);
-        return new Response("Failed to generate order ID", {
-          status: 500,
-        });
-      }
-
-      // 🆔 Generate unique order ID
 
       const timestampSuffix = Date.now().toString().slice(-3); // last 3 digits of timestamp
       const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random number (100–999)
