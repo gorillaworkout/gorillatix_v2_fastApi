@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   // Calculate subtotal, fees, and total (gross amount)
   const subtotal = price * quantity;
-  const fees = Math.ceil(subtotal * 0.02); // 2% fee, rounded up
+  const fees = Math.ceil(subtotal * 0.02) < 4500 ? 4500 : Math.ceil(subtotal * 0.02);
   const serviceCharge = 5000;
   const grossAmount = subtotal + fees + serviceCharge;
 
