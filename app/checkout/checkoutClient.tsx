@@ -41,7 +41,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatRupiah, formatTime } from "@/lib/utils";
 import Loader from "@/components/loading";
 import { EventItem } from "@/types/event";
-import { releaseTickets, reserveTickets } from "@/lib/firebase-service";
+import { confirmPendingTicket, createPendingTicket, releaseTickets, reserveTickets } from "@/lib/firebase-service";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -199,7 +199,16 @@ export default function CheckoutClient({
         eventName: event.title,
         orderId: orderId,
       };
-
+      await createPendingTicket({
+        eventId: event.id,
+        eventName: event.title,
+        quantity: parseInt(values.quantity),
+        price: total,
+        userId: user.uid,
+        customerName: `${values.firstName} ${values.lastName}`,
+        venue: event.venue,
+        orderId,
+      });
       const response = await fetch("/api/transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -217,49 +226,68 @@ export default function CheckoutClient({
       await new Promise<void>((resolve) => {
         snap?.pay(data.token, {
           onSuccess: async () => {
-            const formData = new FormData();
-            formData.append("eventId", event.id);
-            formData.append("quantity", values.quantity);
-            formData.append("price", total.toString());
-            formData.append("userId", user.uid);
-            formData.append(
-              "customerName",
-              `${values.firstName} ${values.lastName}`
-            );
-            formData.append("venue", event.venue);
-            formData.append("status", "confirmed");
-            // initialFormData.append("orderId", orderId);
-            formData.append("orderId", orderId);
-
             try {
-              const result = await processTicketPurchase(formData);
-              if (result.success) {
-                toast({
-                  title: "Payment successful",
-                  description: "You can view your ticket on My Ticket page.",
-                });
-                router.push(`/payment-success?ticketId=${result.ticketId}`);
-              } else {
-                setError(
-                  result.message || "Failed to save ticket after payment."
-                );
-                toast({
-                  variant: "destructive",
-                  title: "Ticket Processing Failed",
-                  description: "Payment succeeded but ticket creation failed.",
-                });
-              }
+              await confirmPendingTicket(orderId); // ✅ hanya update status
+              toast({
+                title: "Payment successful",
+                description: "You can view your ticket on My Ticket page.",
+              });
+              router.push(`/payment-success?orderId=${orderId}`);
             } catch (err) {
-              console.error("Ticket error:", err);
+              console.error("Failed to confirm ticket:", err);
               toast({
                 variant: "destructive",
-                title: "Ticket Save Error",
-                description: "Please contact support.",
+                title: "Ticket Confirmation Failed",
+                description: "Payment succeeded but ticket confirmation failed.",
               });
             } finally {
               resolve();
             }
           },
+          // onSuccess: async () => {
+          //   const formData = new FormData();
+          //   formData.append("eventId", event.id);
+          //   formData.append("quantity", values.quantity);
+          //   formData.append("price", total.toString());
+          //   formData.append("userId", user.uid);
+          //   formData.append(
+          //     "customerName",
+          //     `${values.firstName} ${values.lastName}`
+          //   );
+          //   formData.append("venue", event.venue);
+          //   formData.append("status", "confirmed");
+          //   // initialFormData.append("orderId", orderId);
+          //   formData.append("orderId", orderId);
+
+          //   try {
+          //     const result = await processTicketPurchase(formData);
+          //     if (result.success) {
+          //       toast({
+          //         title: "Payment successful",
+          //         description: "You can view your ticket on My Ticket page.",
+          //       });
+          //       router.push(`/payment-success?ticketId=${result.ticketId}`);
+          //     } else {
+          //       setError(
+          //         result.message || "Failed to save ticket after payment."
+          //       );
+          //       toast({
+          //         variant: "destructive",
+          //         title: "Ticket Processing Failed",
+          //         description: "Payment succeeded but ticket creation failed.",
+          //       });
+          //     }
+          //   } catch (err) {
+          //     console.error("Ticket error:", err);
+          //     toast({
+          //       variant: "destructive",
+          //       title: "Ticket Save Error",
+          //       description: "Please contact support.",
+          //     });
+          //   } finally {
+          //     resolve();
+          //   }
+          // },
 
           onPending: async () => {
             if (didReserve) {

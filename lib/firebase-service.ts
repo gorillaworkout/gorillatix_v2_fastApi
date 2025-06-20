@@ -504,3 +504,61 @@ export async function createTicket(ticketData: {
     throw error;
   }
 }
+
+// lib/firebase/tickets/createPendingTicket.ts
+export async function createPendingTicket({
+  eventId,
+  eventName,
+  quantity,
+  price,
+  userId,
+  customerName,
+  venue,
+  orderId,
+}: {
+  eventId: string;
+  eventName: string;
+  quantity: number;
+  price: number;
+  userId: string;
+  customerName: string;
+  venue: string;
+  orderId: string;
+}) {
+  return await addDoc(collection(db, "tickets"), {
+    eventId,
+    eventName,
+    quantity,
+    totalPrice: price,
+    userId,
+    customerName,
+    venue,
+    orderId,
+    status: "pending",
+    purchaseDate: Timestamp.now(),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+    createdFrom: "client",
+  });
+}
+
+
+// confirm pending ticket to confirmed
+export async function confirmPendingTicket(orderId: string) {
+  const ticketsRef = collection(db, "tickets");
+  const q = query(ticketsRef, where("orderId", "==", orderId));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    throw new Error("Ticket not found for orderId: " + orderId);
+  }
+
+  const docRef = snapshot.docs[0].ref;
+
+  await updateDoc(docRef, {
+    status: "confirmed",
+    updatedAt: Timestamp.now(),
+  });
+
+  console.log("✅ Ticket confirmed for orderId:", orderId);
+}
