@@ -41,10 +41,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatRupiah, formatTime } from "@/lib/utils";
 import Loader from "@/components/loading";
 import { EventItem } from "@/types/event";
-import {
-  releaseTickets,
-  reserveTickets,
-} from "@/lib/firebase-service";
+import { releaseTickets, reserveTickets } from "@/lib/firebase-service";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -96,6 +93,16 @@ export default function CheckoutClient({
         try {
           const eventData = await getEventById(eventId);
           if (eventData) {
+            if (eventData.ticketsAvailable === 0) {
+              toast({
+                variant: "destructive",
+                title: "Event sold out",
+                description: "No more tickets are available for this event.",
+              });
+              router.push("/");
+              return;
+            }
+
             setEvent(eventData);
           } else {
             toast({
@@ -139,13 +146,13 @@ export default function CheckoutClient({
       lastName: user?.displayName?.split(" ")[1] || "",
       email: user?.email || "",
       phone: "",
-      quantity: "0",
+      quantity: "1",
     },
   });
 
   const quantity = Number.parseInt(form.watch("quantity") || "0");
   const subtotal = event && event.price ? event.price * quantity : 0;
-  const fees = Math.ceil(subtotal * 0.02);
+  const fees = Math.ceil(subtotal * 0.02) < 4500 ? 4500 : Math.ceil(subtotal * 0.02);
   const serviceCharge = 5000;
   const total = subtotal + fees + serviceCharge;
 
@@ -330,7 +337,6 @@ export default function CheckoutClient({
     }
   }
 
-
   const COUNTDOWN_SECONDS = 180; // 3 menit
   const [disabledTimeLeft, setDisabledTimeLeft] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -505,7 +511,7 @@ export default function CheckoutClient({
                   <CreditCard className="h-5 w-5" />
                 )}
 
-                 {disabledTimeLeft > 0
+                {disabledTimeLeft > 0
                   ? `Please wait ${formatTime(disabledTimeLeft)}`
                   : quantity <= 0
                   ? "Out of stock"
@@ -544,7 +550,7 @@ export default function CheckoutClient({
                   <span>{formatRupiah(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span> Fees Payment (2%)</span>
+                  <span> Fees Payment</span>
                   <span>{formatRupiah(fees)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">

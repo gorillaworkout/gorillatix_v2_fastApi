@@ -217,56 +217,70 @@ export default function EventsPage() {
   const eventsPerPage = 8;
 
   const filterEvents = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+  setIsLoading(true);
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-      let filteredResults = [...events];
+    let filteredResults = [...events];
 
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        filteredResults = filteredResults.filter(
-          (event) =>
-            event.title.toLowerCase().includes(query) ||
-            event.description.toLowerCase().includes(query) ||
-            event.location.toLowerCase().includes(query)
-        );
-      }
-
-      // Category filter
-      if (category && category !== "all") {
-        filteredResults = filteredResults.filter(
-          (event) => event.category === category
-        );
-      }
-
-      // Optional: only show active and upcoming ticket sales
-      const now = new Date();
-      filteredResults = filteredResults.filter((event) => {
-        const saleStart = new Date(event.startSellingDate);
-        const eventDate = new Date(event.endSellingDate);
-        return saleStart >= now || eventDate >= now;
-      });
-
-      // Sort by soonest ticket sale date
-      filteredResults.sort((a, b) => {
-        const aDate = new Date(a.startSellingDate).getTime();
-        const bDate = new Date(b.startSellingDate).getTime();
-        return aDate - bDate;
-      });
-
-      setFilteredEvents(filteredResults);
-      setPage(1);
-      setDisplayedEvents(filteredResults.slice(0, eventsPerPage));
-    } catch (error) {
-      console.error("Error filtering events:", error);
-      setFilteredEvents([]);
-      setDisplayedEvents([]);
-    } finally {
-      setIsLoading(false);
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filteredResults = filteredResults.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.description.toLowerCase().includes(query) ||
+          event.location.toLowerCase().includes(query)
+      );
     }
-  }, [category, searchQuery, events]);
+
+    // Category filter
+    if (category && category !== "all") {
+      filteredResults = filteredResults.filter(
+        (event) => event.category === category
+      );
+    }
+
+    // Urutkan berdasarkan status waktu: active → upcoming → past
+    const now = new Date();
+
+    const activeEvents = filteredResults.filter((event) => {
+      const start = new Date(event.startSellingDate);
+      const end = new Date(event.endSellingDate);
+      return start <= now && end >= now;
+    });
+
+    const upcomingEvents = filteredResults.filter((event) => {
+      const start = new Date(event.startSellingDate);
+      return start > now;
+    });
+
+    const pastEvents = filteredResults.filter((event) => {
+      const end = new Date(event.endSellingDate);
+      return end < now;
+    });
+
+    const sortByStartDate = (a: any, b: any) =>
+      new Date(a.startSellingDate).getTime() - new Date(b.startSellingDate).getTime();
+
+    activeEvents.sort(sortByStartDate);
+    upcomingEvents.sort(sortByStartDate);
+    pastEvents.sort(sortByStartDate);
+
+    filteredResults = [...activeEvents, ...upcomingEvents, ...pastEvents];
+
+    setFilteredEvents(filteredResults);
+    setPage(1);
+    setDisplayedEvents(filteredResults.slice(0, eventsPerPage));
+  } catch (error) {
+    console.error("Error filtering events:", error);
+    setFilteredEvents([]);
+    setDisplayedEvents([]);
+  } finally {
+    setIsLoading(false);
+  }
+}, [category, searchQuery, events]);
+
 
   useEffect(() => {
     filterEvents();

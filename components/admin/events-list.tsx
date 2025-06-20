@@ -130,7 +130,7 @@ const handleDownloadReport = async (eventId: string) => {
                 <Badge
                   variant={event.ticketsAvailable > 0 ? "default" : "secondary"}
                 >
-                  {event.ticketsAvailable > 0 ? "Active" : "Sold Out"}
+                  {event.ticketsAvailable > 0 ? "Active" : "Sold"}
                 </Badge>
               </TableCell>
               <TableCell>{event.ticketsSold}</TableCell>

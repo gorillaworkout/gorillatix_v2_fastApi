@@ -11,42 +11,47 @@ import { SkeletonCard } from "@/components/skeleton-card";
 export default function Home() {
   // Get events from context
   const { events, loading } = useEvents();
-const sortedEvents = events
-  ? (() => {
-      const now = new Date();
+  const sortedEvents = events
+    ? (() => {
+        const now = new Date();
 
-      const activeEvents = [];
-      const upcomingEvents = [];
+        const activeEvents = [];
+        const upcomingEvents = [];
+        const pastEvents = [];
 
-      for (const event of events) {
-        const sellingStart = new Date(
-          typeof event.startSellingDate === "string"
-            ? event.startSellingDate + "T00:00:00"
-            : event.startSellingDate
-        );
+        for (const event of events) {
+          const sellingStart = new Date(
+            typeof event.startSellingDate === "string"
+              ? event.startSellingDate + "T00:00:00"
+              : event.startSellingDate
+          );
 
-        const eventDate = new Date(
-          typeof event.date === "string"
-            ? event.date + "T23:59:59"
-            : event.date
-        );
+          const eventEnd = new Date(
+            typeof event.endSellingDate === "string"
+              ? event.endSellingDate + "T23:59:59"
+              : event.endSellingDate
+          );
 
-        if (sellingStart <= now && eventDate >= now) {
-          activeEvents.push(event);
-        } else if (sellingStart > now) {
-          upcomingEvents.push(event);
+          if (sellingStart <= now && eventEnd >= now) {
+            activeEvents.push(event);
+          } else if (sellingStart > now) {
+            upcomingEvents.push(event);
+          } else if (eventEnd < now) {
+            pastEvents.push(event);
+          }
         }
-      }
 
-      // Sort active events by startSellingDate ascending (optional)
-      activeEvents.sort((a, b) => new Date(a.startSellingDate).getTime() - new Date(b.startSellingDate).getTime());
+        const sortByStartSellingDate = (a: any, b: any) =>
+          new Date(a.startSellingDate).getTime() -
+          new Date(b.startSellingDate).getTime();
 
-      // Sort upcoming events by startSellingDate ascending
-      upcomingEvents.sort((a, b) => new Date(a.startSellingDate).getTime() - new Date(b.startSellingDate).getTime());
+        activeEvents.sort(sortByStartSellingDate);
+        upcomingEvents.sort(sortByStartSellingDate);
+        pastEvents.sort(sortByStartSellingDate);
 
-      return [...activeEvents, ...upcomingEvents];
-    })()
-  : [];
+        return [...activeEvents, ...upcomingEvents, ...pastEvents];
+      })()
+    : [];
 
   return (
     <div className="container mx-auto px-4 py-8">

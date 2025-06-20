@@ -333,7 +333,7 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel>Date Event</FormLabel>
                     <FormControl>
                       {/* <Input {...field} placeholder="YYYY-MM-DD" /> */}
                       <Input
@@ -396,7 +396,7 @@ export default function EditEventPage({ eventId }: EditEventPageProps) {
                 name="startSellingDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel>Date Selling</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
