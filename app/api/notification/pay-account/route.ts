@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
         });
         // console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
       } else {
-        // console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
+        console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
       }
     }
 

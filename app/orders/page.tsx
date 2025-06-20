@@ -205,68 +205,69 @@ export default function OrdersPage() {
                 {upcomingTickets.map((ticket) => {
                   const event = ticketEvents[ticket.eventId];
                   if (!event) return null;
-
-                  return (
-                    <Card key={ticket.id}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle>{event.title}</CardTitle>
-                            <CardDescription className="mt-2">
-                              <div className="flex items-center">
-                                <Calendar className="mr-1 h-4 w-4" />
-                                {event.date} at {event.time}
-                              </div>
-                              <div className="mt-2 flex flex-row">
-                                {" "}
-                                <MapPin className="mr-1 h-4 w-4 text-white" />
-                                {event.venue}
-                              </div>
-                            </CardDescription>
-                          </div>
-                          <Badge>{ticket.status}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div>
-                            <div className="text-sm font-medium">
-                              Order Details
+                  if(ticket.status === "paid" || ticket.status === "confirmed"){
+                    return (
+                      <Card key={ticket.id}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle>{event.title}</CardTitle>
+                              <CardDescription className="mt-2">
+                                <div className="flex items-center">
+                                  <Calendar className="mr-1 h-4 w-4" />
+                                  {event.date} at {event.time}
+                                </div>
+                                <div className="mt-2 flex flex-row">
+                                  {" "}
+                                  <MapPin className="mr-1 h-4 w-4 text-white" />
+                                  {event.venue}
+                                </div>
+                              </CardDescription>
                             </div>
-                            <div className="mt-1 text-sm text-muted-foreground">
-                              <div>Order #: {ticket.id}</div>
-                              <div>
-                                {ticket.quantity}{" "}
-                                {ticket.quantity === 1 ? "ticket" : "tickets"}
+                            <Badge>{ticket.status === "confirmed" ? "Paid": ticket.status}</Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div>
+                              <div className="text-sm font-medium">
+                                Order Details
                               </div>
-                              <div>
-                                Total: {formatRupiah(ticket.totalPrice)}
+                              <div className="mt-1 text-sm text-muted-foreground">
+                                <div>Order #: {ticket.id}</div>
+                                <div>
+                                  {ticket.quantity}{" "}
+                                  {ticket.quantity === 1 ? "ticket" : "tickets"}
+                                </div>
+                                <div>
+                                  Total: {formatRupiah(ticket.totalPrice)}
+                                </div>
                               </div>
                             </div>
+                            <div className="flex items-center justify-end gap-2">
+                              {(ticket.status === "confirmed" || ticket.status === "paid") && (
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleDownloadTicket(ticket)}
+                                  >
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Download
+                                  </Button>
+                                  <Button size="sm" onClick={() => handleViewTicket(ticket)}>
+                                    <Ticket className="mr-2 h-4 w-4" />
+                                    View Tickets
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            {(ticket.status === "confirmed" || ticket.status === "paid") && (
-                              <>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleDownloadTicket(ticket)}
-                                >
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Download
-                                </Button>
-                                <Button size="sm" onClick={() => handleViewTicket(ticket)}>
-                                  <Ticket className="mr-2 h-4 w-4" />
-                                  View Tickets
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        <HiddenTicketDownload ticket={ticket} event={event} />
-                      </CardContent>
-                    </Card>
-                  );
+                          <HiddenTicketDownload ticket={ticket} event={event} />
+                        </CardContent>
+                      </Card>
+                    );
+                  }
                 })}
               </div>
             ) : (
