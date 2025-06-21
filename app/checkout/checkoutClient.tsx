@@ -177,7 +177,7 @@ export default function CheckoutClient({
     const timestampSuffix = Date.now().toString().slice(-3); // last 3 digits of timestamp
     const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random number (100–999)
     const orderId = `ORDER-${values.firstName}-${timestampSuffix}${randomSuffix}`;
-
+    console.log(orderId, 'order Id')
     const transactionPayload = {
       firstName: values.firstName,
       lastName: values.lastName,
@@ -226,9 +226,11 @@ export default function CheckoutClient({
             description: "Check your bank app.",
           });
           resolve();
+          router.push("/");
         },
         onError: () => {
           toast({ variant: "destructive", title: "Payment failed" });
+          router.push("/");
           resolve();
         },
         onClose: () => {
