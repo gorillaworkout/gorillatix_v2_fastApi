@@ -509,6 +509,7 @@ export async function createPendingTicket({
   customerName,
   venue,
   orderId,
+  status
 }: {
   eventId: string;
   eventName: string;
@@ -518,6 +519,7 @@ export async function createPendingTicket({
   customerName: string;
   venue: string;
   orderId: string;
+  status: string
 }) {
   return await addDoc(collection(db, "tickets"), {
     eventId,
@@ -528,7 +530,7 @@ export async function createPendingTicket({
     customerName,
     venue,
     orderId,
-    status: "pending",
+    status,
     purchaseDate: Timestamp.now(),
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
