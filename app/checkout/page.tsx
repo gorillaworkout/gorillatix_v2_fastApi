@@ -6,7 +6,7 @@ import Loader from "@/components/loading";
 export default function CheckoutPage() {
   return (
     <Suspense fallback={<Loader title="Loading..."/>}>
-      <CheckoutPageWrapper />
+      {/* <CheckoutPageWrapper /> */}
     </Suspense>
   )
 }
