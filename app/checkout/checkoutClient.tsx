@@ -35,7 +35,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useEvents } from "@/context/event-context";
-import { processTicketPurchase } from "./actions";
 import { useAuth } from "@/components/auth-provider";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatRupiah, formatTime } from "@/lib/utils";
@@ -44,11 +43,8 @@ import { EventItem } from "@/types/event";
 import {
   confirmPendingTicket,
   createPendingTicket,
-  releaseTickets,
   reserveTickets,
 } from "@/lib/firebase-service";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "First name is required" }),
@@ -168,11 +164,9 @@ export default function CheckoutClient({
 
   setIsLoading(true);
   setError(null);
-  let didReserve = false;
 
   try {
     await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
-    didReserve = true;
 
     const timestampSuffix = Date.now().toString().slice(-3); // last 3 digits of timestamp
     const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random number (100–999)
