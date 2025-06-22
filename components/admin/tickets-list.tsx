@@ -40,6 +40,7 @@ export default function TicketsPage() {
   const [minQuantity, setMinQuantity] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [eventStats, setEventStats] = useState<Record<string, number>>({});
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
   useEffect(() => {
     async function fetchTickets() {
@@ -69,11 +70,19 @@ export default function TicketsPage() {
   const eventNames = Object.keys(eventStats).sort();
 
   const filteredTickets = tickets.filter((ticket) => {
-    const eventMatch =
-      selectedEvent === "all" || ticket.eventName === selectedEvent;
-    const quantityMatch = ticket.quantity >= minQuantity;
-    return eventMatch && quantityMatch;
-  });
+  const eventMatch =
+    selectedEvent === "all" || ticket.eventName === selectedEvent;
+  const quantityMatch = ticket.quantity >= minQuantity;
+
+  const statusMatch =
+    selectedStatus === "all" ||
+    (selectedStatus === "paid_confirmed" &&
+      (ticket.status === "paid" || ticket.status === "confirmed")) ||
+    ticket.status === selectedStatus;
+
+  return eventMatch && quantityMatch && statusMatch;
+});
+
 
   const totalQuantity = filteredTickets.reduce(
     (sum, ticket) => sum + ticket.quantity,
@@ -134,6 +143,19 @@ export default function TicketsPage() {
             <SelectItem value="5">5+</SelectItem>
           </SelectContent>
         </Select>
+
+          {/* Filter by Status */}
+         <Select onValueChange={setSelectedStatus} defaultValue="all">
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="paid_confirmed">Paid / Confirmed</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {loading ? (
@@ -142,7 +164,7 @@ export default function TicketsPage() {
         <p>No tickets found.</p>
       ) : (
         <>
-          <div className="overflow-auto rounded-lg border">
+          <div className="overflow-auto rounded-lg border h-[500px]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -158,7 +180,7 @@ export default function TicketsPage() {
                   <TableHead>Purchase Date</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="overflow-scroll">
                 {filteredTickets.map((ticket, index) => (
                   <TableRow key={`${ticket.orderId}-${index}`}>
                     <TableCell>{index + 1}</TableCell>
