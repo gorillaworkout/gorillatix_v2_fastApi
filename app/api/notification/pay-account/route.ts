@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 5: ♻️ Release ticket if needed
-    if (["pending", "expire", "cancel", "deny", "error", "cancelled"].includes(verifiedStatus)) {
+    if (["expire", "cancel", "deny", "error", "cancelled"].includes(verifiedStatus)) {
       try {
         await releaseTicketsByOrderId(order_id);
         console.log(`🔁 Tickets released for orderId: ${order_id}`);
