@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
 // import { releaseTicketsByOrderId, updateHoldTickets } from "@/lib/firebase-service-server";
 
 if (!getApps().length) {
@@ -231,9 +231,9 @@ export async function releaseTicketsByOrderId(orderId: string) {
   const ticketRef = ticketDoc.ref;
 
   const eventId = ticketData.eventId;
-  const quantity = ticketData.quantity;
+  const quantity = typeof ticketData.quantity === "number" ? ticketData.quantity : 1;
 
-  // Step 1: delete or mark as released
+  // Step 1: mark ticket as released
   await ticketRef.update({
     status: "released",
     updatedAt: Timestamp.now(),
@@ -241,10 +241,15 @@ export async function releaseTicketsByOrderId(orderId: string) {
 
   console.log(`🗑️ Ticket marked as released for orderId: ${orderId}`);
 
-  // Step 2: update holdTickets (kurangi)
+  // Step 2: update holdTickets
   await updateHoldTickets(eventId, -quantity);
   console.log(`🔁 Reduced holdTickets by ${quantity} for event: ${eventId}`);
+
+  // Step 3: update ticketAvailable
+  await updateTicketsAvailable(eventId, quantity);
+  console.log(`🎟️ Returned ${quantity} to ticketAvailable for event: ${eventId}`);
 }
+
 
 
 export async function updateHoldTickets(eventId: string, delta: number) {
@@ -263,4 +268,12 @@ export async function updateHoldTickets(eventId: string, delta: number) {
   });
 
   console.log(`🔁 Updated holdTickets for event ${eventId}: delta ${delta}`);
+}
+
+export async function updateTicketsAvailable(eventId: string, quantity: number) {
+  const eventRef = db.collection("events").doc(eventId);
+  await eventRef.update({
+    ticketsAvailable: FieldValue.increment(quantity),
+    updatedAt: Timestamp.now(),
+  });
 }
