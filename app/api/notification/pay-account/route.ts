@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import { releaseTicketsByOrderId } from "@/lib/firebase-service";
+import { releaseTicketsByOrderId, updateHoldTickets } from "@/lib/firebase-service-server";
 
 if (!getApps().length) {
   initializeApp({
@@ -214,20 +214,3 @@ export async function updateTicketsSold(eventId: string, quantity: number) {
   console.log(`📈 Updated ticketsSold for event ${eventId}, ${quantity}`);
 }
 
-export async function updateHoldTickets(eventId: string, delta: number) {
-  const eventRef = db.collection("events").doc(eventId);
-
-  await db.runTransaction(async (transaction) => {
-    const eventSnap = await transaction.get(eventRef);
-    if (!eventSnap.exists) throw new Error("Event not found");
-
-    const currentHold = parseInt(eventSnap.data()?.holdTickets || "0", 10);
-    const newHold = Math.max(0, currentHold + delta); // prevent negative
-    transaction.update(eventRef, {
-      holdTickets: newHold,
-      updatedAt: Timestamp.now(),
-    });
-  });
-
-  console.log(`🔁 Updated holdTickets for event ${eventId}: delta ${delta}`);
-}
