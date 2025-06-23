@@ -73,7 +73,11 @@ export async function POST(req: NextRequest) {
 
     // Step 2: ✅ Verify real transaction status from Midtrans
     const midtransEnv = process.env.MIDTRANS_ENV || "sandbox";
-    const linkMidtrans = midtransEnv === "production" ? "https://api.midtrans.com" : "https://api.sandbox.midtrans.com";
+    const linkMidtrans =
+      midtransEnv === "production"
+        ? "https://api.midtrans.com"
+        : "https://api.sandbox.midtrans.com";
+
     const midtransStatusRes = await fetch(`${linkMidtrans}/v2/${order_id}/status`, {
       headers: {
         Authorization: `Basic ${Buffer.from(MIDTRANS_SERVER_KEY + ":").toString("base64")}`,
@@ -108,7 +112,6 @@ export async function POST(req: NextRequest) {
     if (ticketsQuery.empty) {
       if (newStatus === "paid") {
         if (!customer_name || !event_id) {
-          // console.warn("⚠️ Missing required data for ticket creation");
           return NextResponse.json({ message: "Missing ticket info" }, { status: 400 });
         }
 
@@ -128,9 +131,11 @@ export async function POST(req: NextRequest) {
           updatedAt: Timestamp.now(),
         });
 
-        // console.log(`✅ Ticket created for paid order: ${order_id}`);
+        console.log(`✅ Ticket created for paid order: ${order_id}`);
+
+        // ✅ Update ticketsSold
+        await updateTicketsSold(event_id, Number(quantity || 1));
       } else {
-        // console.warn(`⚠️ Ticket not found for order_id: ${order_id}`);
         return NextResponse.json({ message: "Ticket not found" }, { status: 404 });
       }
     } else {
@@ -145,7 +150,13 @@ export async function POST(req: NextRequest) {
           midtransStatus: verifiedStatus,
           updatedAt: Timestamp.now(),
         });
-        // console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
+
+        console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
+
+        // ✅ Update ticketsSold if status now is paid
+        if (newStatus === "paid" || newStatus === "confirmed") {
+          await updateTicketsSold(event_id, Number(quantity || 1));
+        }
       } else {
         console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
       }
@@ -155,7 +166,7 @@ export async function POST(req: NextRequest) {
     if (["pending", "expire", "cancel", "deny", "error", "cancelled"].includes(verifiedStatus)) {
       try {
         await releaseTicketsByOrderId(order_id);
-        // console.log(`🔁 Tickets released for orderId: ${order_id}`);
+        console.log(`🔁 Tickets released for orderId: ${order_id}`);
       } catch (err) {
         console.error("❌ Failed to release tickets:", err);
       }
@@ -172,11 +183,27 @@ export async function POST(req: NextRequest) {
         receivedAt: Timestamp.now(),
         body: typeof body === "object" ? body : {},
       });
-      // console.log("📝 Logged Midtrans body to Firestore.");
+      console.log("📝 Logged Midtrans body to Firestore.");
     } catch (logError) {
       console.error("❌ Failed to log Midtrans body:", logError);
     }
   }
 }
 
+// ✅ Helper to update ticketsSold
+export async function updateTicketsSold(eventId: string, quantity: number) {
+  const eventRef = db.collection("events").doc(eventId);
 
+  await db.runTransaction(async (transaction: { get: (arg0: any) => any; update: (arg0: any, arg1: { ticketsSold: any; updatedAt: any; }) => void; }) => {
+    const eventDoc = await transaction.get(eventRef);
+    if (!eventDoc.exists) throw new Error("Event not found");
+
+    const currentSold = eventDoc.data()?.ticketsSold || 0;
+    transaction.update(eventRef, {
+      ticketsSold: currentSold + quantity,
+      updatedAt: Timestamp.now(),
+    });
+  });
+
+  console.log(`📈 Updated ticketsSold for event ${eventId}`);
+}

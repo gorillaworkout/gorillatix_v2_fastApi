@@ -136,7 +136,7 @@ export default function NewEventPage() {
           title: "Event created",
           description: "Your event has been created successfully.",
         });
-        router.push("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
         throw new Error("Failed to create event");
       }

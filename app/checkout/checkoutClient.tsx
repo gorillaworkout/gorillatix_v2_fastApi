@@ -121,7 +121,9 @@ export default function CheckoutClient({
             title: "Error loading event",
             description: "There was a problem loading the event details.",
           });
+            router.push("/events");
         } finally {
+        
           setIsLoadingEvent(false);
         }
       } else {

@@ -16,13 +16,13 @@ import Head from "next/head";
 import LocationSection from "./../../../components/locatioSection";
 import { useRouter } from "next/navigation";
 import { ShareEventSection } from "@/components/share-event-section";
-import { TicketButton } from "@/components/ticket-button";
-import { isAfter, isBefore, set } from "date-fns";
 import { DateTime } from "luxon";
+import { toast } from "@/hooks/use-toast";
+import { getEventBySlug } from "@/lib/firebase-service";
 
 export default function EventPage() {
   const params = useParams();
-  const { events, getEventBySlug } = useEvents();
+  const { events } = useEvents();
   const [event, setEvent] = useState<EventItem | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -34,6 +34,7 @@ export default function EventPage() {
   useEffect(() => {
     async function fetchEvent() {
       if (params.slug) {
+        console.log(params.slug, 'params suslg')
         try {
           // First try to find the event in the context
           const slug = params.slug as string;
@@ -60,6 +61,7 @@ export default function EventPage() {
             setIsDisabled(isBeforeSelling || isAfterSelling);
             setStart(start);
             setEvent(foundEvent);
+            console.log(foundEvent, 'found event')
           } else {
             // If not found in context, try to fetch it
             const fetchedEvent = await getEventBySlug(slug);
@@ -83,6 +85,38 @@ export default function EventPage() {
       router.push("/");
     }
   }, [loading, event, router]);
+
+//   const handleBuyTickets = async () => {
+//   const eventFresh = await getEventBySlug(params.slug as string); // Firestore fetch
+//   console.log(eventFresh, 'event fresh');
+//   console.log(eventFresh?.ticketsAvailable, 'ticket')
+//   if (eventFresh && eventFresh.ticketsAvailable > 0) {
+//     // href={`/checkout?eventId=${event.id}
+//     router.push(`/checkout?eventId=${event?.id}`);
+//   } else {
+//     toast({
+//       variant: "destructive",
+//       title: "Tickets Sold Out",
+//       description: "Sorry, all tickets are already taken.",
+//     });
+//     // window.location.href = "/";  
+//   }
+// };
+const handleBuyTickets = async () => {
+  const eventFresh = await getEventBySlug(params.slug as string);
+  const available = Number(eventFresh?.ticketsAvailable) || 0;
+
+  if (eventFresh && available > 0) {
+    router.push(`/checkout?eventId=${eventFresh.id}`);
+  } else {
+    toast({
+      variant: "destructive",
+      title: "Tickets Sold Out",
+      description: "Sorry, all tickets are already taken.",
+    });
+    window.location.href = "/";  
+  }
+};
 
   if (loading) {
     return (
@@ -328,12 +362,12 @@ export default function EventPage() {
                     </>
                   ) : event.ticketsAvailable > 0 ?
                     <>
-                      <Link href={`/checkout?eventId=${event.id}`}
+                      {/* <Link href={`/checkout?eventId=${event.id}`}
                         className="w-full">
-                        <Button className="w-full">
+                      </Link> */}
+                        <Button className="w-full" onClick={handleBuyTickets}>
                           Buy Tickets
                         </Button>
-                      </Link>
                     </>
                     :
                     (

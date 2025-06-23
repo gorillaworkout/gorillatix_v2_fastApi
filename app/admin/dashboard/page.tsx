@@ -34,6 +34,9 @@ import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
 import { formatRupiah } from "@/lib/utils";
 import TicketsPage from "@/components/admin/tickets-list";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { exportToExcelWithTitle } from "@/scripts/excel";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -91,15 +94,80 @@ export default function AdminDashboardPage() {
     );
   }
 
+  // download function
+  //     const handleDownloadAllReports = async () => {
+  //   try {
+  //     const querySnapshot = await getDocs(collection(db, "tickets"));
+  //     const tickets = querySnapshot.docs.map(doc => {
+  //       const data = doc.data();
+  //       return {
+  //         "Customer Name": data.customerName,
+  //         "User ID": data.userId,
+  //         "Order ID": data.orderId,
+  //         "Event Name": data.eventName,
+  //         "Purchase Date": data.purchaseDate?.toDate?.().toLocaleString?.() || "-",
+  //         "Quantity": data.quantity,
+  //         "Status": data.status,
+  //         "Total Price": formatRupiah(data.totalPrice),
+  //         "Venue": data.venue,
+  //       };
+  //     });
+
+  //     if (tickets.length === 0) {
+  //       alert("No tickets found.");
+  //       return;
+  //     }
+
+  //     const title = "All Ticket Reports";
+  //     exportToExcelWithTitle(tickets, "all-tickets-report", title);
+  //   } catch (error) {
+  //     console.error("❌ Error exporting all tickets:", error);
+  //     alert("Failed to download Excel. Check console for details.");
+  //   }
+  // };
+  const handleDownloadAllReports = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "tickets"));
+
+      const tickets = querySnapshot.docs
+        .map((doc) => doc.data())
+        .filter((data) => ["paid", "confirmed"].includes(data.status)) // 🎯 hanya paid & confirmed
+        .map((data) => ({
+          "Customer Name": data.customerName || "-",
+          "User ID": data.userId || "-",
+          "Order ID": data.orderId || "-",
+          "Event Name": data.eventName || "-",
+          "Purchase Date":
+            data.purchaseDate?.toDate?.().toLocaleString?.() || "-",
+          Quantity: data.quantity ?? "-",
+          Status: data.status || "-",
+          "Total Price": data.totalPrice ? formatRupiah(data.totalPrice) : "-",
+          Venue: data.venue || "-",
+        }));
+
+      if (tickets.length === 0) {
+        alert("No paid or confirmed tickets found.");
+        return;
+      }
+
+      const title = "Paid & Confirmed Ticket Reports";
+      exportToExcelWithTitle(tickets, "paid-confirmed-tickets-report", title);
+    } catch (error) {
+      console.error("❌ Error exporting tickets:", error);
+      alert("Failed to download Excel. Check console for details.");
+    }
+  };
+
+  //
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
+          {/* <Button variant="outline">
             <Download className="mr-2 h-4 w-4" />
             Download Report
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -222,9 +290,15 @@ export default function AdminDashboardPage() {
                 <CardTitle>Upcoming Events</CardTitle>
                 <CardDescription>Manage your upcoming events</CardDescription>
               </div>
-              <Button asChild>
-                <Link href="/admin/events/new">Add Event</Link>
-              </Button>
+              <div className="gap-x-4 flex flex-row">
+                <Button asChild>
+                  <Link href="/admin/events/new">Add Event</Link>
+                </Button>
+                <Button variant="outline" onClick={handleDownloadAllReports}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download All Repoort
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <AdminEventsList />
@@ -236,13 +310,11 @@ export default function AdminDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Tickets</CardTitle>
-              <CardDescription>
-                Ticket Detailed
-              </CardDescription>
+              <CardDescription>Ticket Detailed</CardDescription>
             </CardHeader>
             <CardContent>
-                <TicketsPage />
-              </CardContent>
+              <TicketsPage />
+            </CardContent>
           </Card>
         </TabsContent>
 

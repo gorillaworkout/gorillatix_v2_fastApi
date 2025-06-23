@@ -103,8 +103,10 @@ const handleDownloadReport = async (eventId: string) => {
         <TableHeader>
           <TableRow>
             <TableHead>Event</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Location</TableHead>
+            <TableHead>Event Date</TableHead>
+            <TableHead>Event Date Start Selling</TableHead>
+            <TableHead>Event Date End Selling</TableHead>
+            <TableHead>Time Selling</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Tickets Sold</TableHead>
@@ -122,7 +124,9 @@ const handleDownloadReport = async (eventId: string) => {
                   {formatDate(event.date)}
                 </div>
               </TableCell>
-              <TableCell>{event.location}</TableCell>
+              <TableCell>{event.startSellingDate}</TableCell>
+              <TableCell>{event.endSellingDate}</TableCell>
+              <TableCell>{event.timeSelling}</TableCell>
               <TableCell>
                 <Badge variant="outline">{event.category}</Badge>
               </TableCell>
