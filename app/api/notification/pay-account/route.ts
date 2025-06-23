@@ -170,6 +170,7 @@ export async function POST(req: NextRequest) {
     // Step 5: ♻️ Release ticket if needed
     if (["expire", "cancel", "deny", "error", "cancelled"].includes(verifiedStatus)) {
       try {
+        console.log('release tickets for orderId:', order_id);
         await releaseTicketsByOrderId(order_id);
         console.log(`🔁 Tickets released for orderId: ${order_id}`);
       } catch (err) {
@@ -177,7 +178,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ message: "✅ Notification processed successfully" });
+    return NextResponse.json({ message: `✅ Notification processed successfully ${order_id}` });
   } catch (error) {
     console.error("❌ Webhook error:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
