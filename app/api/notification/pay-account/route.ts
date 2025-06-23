@@ -154,8 +154,21 @@ export async function POST(req: NextRequest) {
         console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
 
         // ✅ Update ticketsSold if status now is paid
-        if (newStatus === "paid" || newStatus === "confirmed") {
+       if (newStatus === "paid" && ticketData.status !== "paid") {
           await updateTicketsSold(event_id, Number(quantity || 1));
+
+          const eventRef = db.collection("events").doc(event_id);
+          await db.runTransaction(async (transaction) => {
+            const snap = await transaction.get(eventRef);
+            if (!snap.exists) throw new Error("Event not found");
+
+            const currentHold = snap.data()?.holdTickets || 0;
+            const newHold = Math.max(0, currentHold - Number(quantity || 1));
+            transaction.update(eventRef, {
+              holdTickets: newHold,
+              updatedAt: Timestamp.now()
+            });
+          });
         }
       } else {
         console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
@@ -194,16 +207,16 @@ export async function POST(req: NextRequest) {
 export async function updateTicketsSold(eventId: string, quantity: number) {
   const eventRef = db.collection("events").doc(eventId);
 
-  await db.runTransaction(async (transaction: { get: (arg0: any) => any; update: (arg0: any, arg1: { ticketsSold: any; updatedAt: any; }) => void; }) => {
-    const eventDoc = await transaction.get(eventRef);
-    if (!eventDoc.exists) throw new Error("Event not found");
+  await db.runTransaction(async (transaction) => {
+    const docSnap = await transaction.get(eventRef);
+    if (!docSnap.exists) throw new Error("Event not found");
 
-    const currentSold = eventDoc.data()?.ticketsSold || 0;
+    const current = docSnap.data()?.ticketsSold || 0;
     transaction.update(eventRef, {
-      ticketsSold: currentSold + quantity,
-      updatedAt: Timestamp.now(),
+      ticketsSold: current + quantity,
+      updatedAt: Timestamp.now()
     });
   });
 
-  console.log(`📈 Updated ticketsSold for event ${eventId}`);
+  console.log(`📈 Updated ticketsSold for event ${eventId}, ${quantity}`);
 }

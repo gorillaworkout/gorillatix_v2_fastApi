@@ -500,6 +500,44 @@ export async function createTicket(ticketData: {
 }
 
 // lib/firebase/tickets/createPendingTicket.ts
+// export async function createPendingTicket({
+//   eventId,
+//   eventName,
+//   quantity,
+//   price,
+//   userId,
+//   customerName,
+//   venue,
+//   orderId,
+//   status
+// }: {
+//   eventId: string;
+//   eventName: string;
+//   quantity: number;
+//   price: number;
+//   userId: string;
+//   customerName: string;
+//   venue: string;
+//   orderId: string;
+//   status: string
+// }) {
+//   return await addDoc(collection(db, "tickets"), {
+//     eventId,
+//     eventName,
+//     quantity,
+//     totalPrice: price,
+//     userId,
+//     customerName,
+//     venue,
+//     orderId,
+//     status,
+//     purchaseDate: Timestamp.now(),
+//     createdAt: Timestamp.now(),
+//     updatedAt: Timestamp.now(),
+//     createdFrom: "client",
+//   });
+// }
+
 export async function createPendingTicket({
   eventId,
   eventName,
@@ -519,9 +557,10 @@ export async function createPendingTicket({
   customerName: string;
   venue: string;
   orderId: string;
-  status: string
+  status: string;
 }) {
-  return await addDoc(collection(db, "tickets"), {
+  // 1. Create the ticket
+  await addDoc(collection(db, "tickets"), {
     eventId,
     eventName,
     quantity,
@@ -534,10 +573,22 @@ export async function createPendingTicket({
     purchaseDate: Timestamp.now(),
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
-    createdFrom: "client",
+    createdFrom: "client"
+  });
+
+  // 2. Increment holdTickets in the event
+  const eventRef = doc(db, "events", eventId);
+  await runTransaction(db, async (transaction) => {
+    const snap = await transaction.get(eventRef);
+    if (!snap.exists()) throw new Error("Event not found");
+
+    const currentHold = snap.data().holdTickets || 0;
+    transaction.update(eventRef, {
+      holdTickets: currentHold + quantity,
+      updatedAt: Timestamp.now()
+    });
   });
 }
-
 
 // confirm pending ticket to confirmed
 export async function confirmPendingTicket(orderId: string) {
