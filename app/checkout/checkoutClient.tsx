@@ -242,7 +242,7 @@ export default function CheckoutClient({
               });
 
               const data = await res.json();
-              console.log("📦 stuckPending response:", data);
+              // console.log("📦 stuckPending response:", data);
 
               if (!res.ok) {
                 console.warn("❌ stuckPending update failed:", data.message);

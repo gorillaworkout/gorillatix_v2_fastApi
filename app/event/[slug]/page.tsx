@@ -34,7 +34,6 @@ export default function EventPage() {
   useEffect(() => {
     async function fetchEvent() {
       if (params.slug) {
-        console.log(params.slug, 'params suslg')
         try {
           // First try to find the event in the context
           const slug = params.slug as string;
@@ -61,7 +60,6 @@ export default function EventPage() {
             setIsDisabled(isBeforeSelling || isAfterSelling);
             setStart(start);
             setEvent(foundEvent);
-            console.log(foundEvent, 'found event')
           } else {
             // If not found in context, try to fetch it
             const fetchedEvent = await getEventBySlug(slug);

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   try {
     body = await req.json();
-    console.log("📩 Received Midtrans notification:", body);
+    // console.log("📩 Received Midtrans notification:", body);
 
     const {
       order_id,
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
           updatedAt: Timestamp.now(),
         });
 
-        console.log(`✅ Ticket created for paid order: ${order_id}`);
+        // console.log(`✅ Ticket created for paid order: ${order_id}`);
 
         // ✅ Update ticketsSold
         await updateTicketsSold(event_id, Number(quantity || 1));
@@ -155,9 +155,9 @@ export async function POST(req: NextRequest) {
           updatedAt: Timestamp.now(),
         });
 
-        console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
+        // console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
       } else {
-        console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
+        // console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
       }
 
       // ✅ Tambahkan ticket sold & kurangi hold jika status paid
@@ -170,9 +170,9 @@ export async function POST(req: NextRequest) {
     // Step 5: ♻️ Release ticket if needed
     if (["expire", "cancel", "deny", "error", "cancelled"].includes(verifiedStatus)) {
       try {
-        console.log('release tickets for orderId:', order_id);
+        // console.log('release tickets for orderId:', order_id);
         await releaseTicketsByOrderId(order_id);
-        console.log(`🔁 Tickets released for orderId: ${order_id}`);
+        // console.log(`🔁 Tickets released for orderId: ${order_id}`);
       } catch (err) {
         console.error("❌ Failed to release tickets:", err);
       }
@@ -211,7 +211,7 @@ export async function updateTicketsSold(eventId: string, quantity: number) {
     });
   });
 
-  console.log(`📈 Updated ticketsSold for event ${eventId}, ${quantity}`);
+  // console.log(`📈 Updated ticketsSold for event ${eventId}, ${quantity}`);
 }
 
 
@@ -239,15 +239,15 @@ export async function releaseTicketsByOrderId(orderId: string) {
     updatedAt: Timestamp.now(),
   });
 
-  console.log(`🗑️ Ticket marked as released for orderId: ${orderId}`);
+  // console.log(`🗑️ Ticket marked as released for orderId: ${orderId}`);
 
   // Step 2: update holdTickets
   await updateHoldTickets(eventId, -quantity);
-  console.log(`🔁 Reduced holdTickets by ${quantity} for event: ${eventId}`);
+  // console.log(`🔁 Reduced holdTickets by ${quantity} for event: ${eventId}`);
 
   // Step 3: update ticketAvailable
   await updateTicketsAvailable(eventId, quantity);
-  console.log(`🎟️ Returned ${quantity} to ticketAvailable for event: ${eventId}`);
+  // console.log(`🎟️ Returned ${quantity} to ticketAvailable for event: ${eventId}`);
 }
 
 
@@ -267,7 +267,7 @@ export async function updateHoldTickets(eventId: string, delta: number) {
     });
   });
 
-  console.log(`🔁 Updated holdTickets for event ${eventId}: delta ${delta}`);
+  // console.log(`🔁 Updated holdTickets for event ${eventId}: delta ${delta}`);
 }
 
 export async function updateTicketsAvailable(eventId: string, quantity: number) {

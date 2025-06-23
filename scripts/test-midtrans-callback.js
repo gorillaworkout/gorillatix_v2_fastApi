@@ -24,7 +24,7 @@ async function sendCallback(orderId, statusCode, grossAmount, transactionStatus)
 
   try {
     const res = await axios.post(endpoint, body)
-    console.log(`Order ${orderId}: ${res.status} ${res.data.message}`)
+    // console.log(`Order ${orderId}: ${res.status} ${res.data.message}`)
   } catch (err) {
     console.error(`Order ${orderId}: Error`, err.response?.data || err.message)
   }
