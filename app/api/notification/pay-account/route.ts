@@ -144,6 +144,10 @@ export async function POST(req: NextRequest) {
       const ticketRef = ticketDoc.ref;
       const ticketData = ticketDoc.data();
 
+      const ticketEventId = ticketData.eventId;
+      const ticketQuantity = ticketData.quantity || Number(quantity) || 1;
+
+      // ✅ Tetap update status jika berbeda
       if (ticketData.status !== newStatus) {
         await ticketRef.update({
           status: newStatus,
@@ -152,26 +156,14 @@ export async function POST(req: NextRequest) {
         });
 
         console.log(`🔄 Ticket updated for ${order_id} → ${newStatus}`);
-
-        // ✅ Update ticketsSold if status now is paid
-       if (newStatus === "paid" && ticketData.status !== "paid") {
-          await updateTicketsSold(event_id, Number(quantity || 1));
-
-          const eventRef = db.collection("events").doc(event_id);
-          await db.runTransaction(async (transaction) => {
-            const snap = await transaction.get(eventRef);
-            if (!snap.exists) throw new Error("Event not found");
-
-            const currentHold = snap.data()?.holdTickets || 0;
-            const newHold = Math.max(0, currentHold - Number(quantity || 1));
-            transaction.update(eventRef, {
-              holdTickets: newHold,
-              updatedAt: Timestamp.now()
-            });
-          });
-        }
       } else {
         console.log(`ℹ️ Ticket for ${order_id} already in status: ${newStatus}`);
+      }
+
+      // ✅ Tambahkan ticket sold & kurangi hold jika status paid
+      if (newStatus === "paid" || newStatus === "confirmed") {
+        await updateTicketsSold(ticketEventId, ticketQuantity);
+        await updateHoldTickets(ticketEventId, -ticketQuantity);
       }
     }
 
@@ -219,4 +211,22 @@ export async function updateTicketsSold(eventId: string, quantity: number) {
   });
 
   console.log(`📈 Updated ticketsSold for event ${eventId}, ${quantity}`);
+}
+
+export async function updateHoldTickets(eventId: string, delta: number) {
+  const eventRef = db.collection("events").doc(eventId);
+
+  await db.runTransaction(async (transaction) => {
+    const eventSnap = await transaction.get(eventRef);
+    if (!eventSnap.exists) throw new Error("Event not found");
+
+    const currentHold = parseInt(eventSnap.data()?.holdTickets || "0", 10);
+    const newHold = Math.max(0, currentHold + delta); // prevent negative
+    transaction.update(eventRef, {
+      holdTickets: newHold,
+      updatedAt: Timestamp.now(),
+    });
+  });
+
+  console.log(`🔁 Updated holdTickets for event ${eventId}: delta ${delta}`);
 }
