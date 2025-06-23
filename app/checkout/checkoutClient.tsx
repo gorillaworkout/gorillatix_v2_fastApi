@@ -100,7 +100,7 @@ export default function CheckoutClient({
                 title: "Event sold out",
                 description: "No more tickets are available for this event.",
               });
-              router.push("/");
+              window.location.href="/"
               return;
             }
 
@@ -222,13 +222,14 @@ export default function CheckoutClient({
               description: "Check your bank app.",
             });
             resolve();
-            router.push("/");
+            window.location.href="/"
           },
           onError: () => {
             toast({ variant: "destructive", title: "Payment failed" });
-            router.push("/");
+            window.location.href="/"
             resolve();
           },
+
           onClose: async () => {
             try {
               const res = await fetch("/api/stuck-payment", {
@@ -251,7 +252,7 @@ export default function CheckoutClient({
             }
 
             toast({ title: "Payment cancelled" });
-            router.push("/");
+            window.location.href="/"
             resolve();
           }
         });
@@ -265,7 +266,7 @@ export default function CheckoutClient({
             description:
               "The tickets have been sold out or held by other users. Please try another event.",
           });
-          router.push("/");
+          window.location.href="/"
           return;
         }
 

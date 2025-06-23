@@ -1,4 +1,4 @@
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,31 +16,48 @@ const db = getFirestore();
 
 export async function POST(req: NextRequest) {
   try {
-    const { eventId, quantity } = await req.json();
+    const text = await req.text();
+    console.log("Raw body text:", text);
+
+    let body;
+    try {
+      body = JSON.parse(text);
+    } catch (err) {
+      console.error("🚨 JSON parse error:", err);
+      return NextResponse.json({ message: "Invalid JSON format" }, { status: 400 });
+    }
+
+    const { eventId, quantity = 1 } = body;
 
     if (!eventId || !quantity) {
-      return NextResponse.json({ message: "Missing eventId or quantity" }, { status: 400 });
+      return NextResponse.json({ message: "Missing data" }, { status: 400 });
     }
 
-    // Untuk firebase-admin, buat doc ref pakai method doc() dari db
     const eventRef = db.collection("events").doc(eventId);
-    const eventSnap = await eventRef.get();
 
-    if (!eventSnap.exists) {
-      return NextResponse.json({ message: "Event not found" }, { status: 404 });
-    }
+    await db.runTransaction(async (tx) => {
+      const docSnap = await tx.get(eventRef);
+      if (!docSnap.exists) throw new Error("Event not found");
 
-    const eventData = eventSnap.data();
-    const currentStuck = eventData?.stuckPending || 0;
+      const currentHold = docSnap.data()?.holdTickets || 0;
+      const newHold = Math.max(0, currentHold - quantity);
 
-    await eventRef.update({
-      stuckPending: currentStuck + quantity,
+      tx.update(eventRef, {
+        holdTickets: newHold,
+        updatedAt: Timestamp.now(),
+      });
     });
 
-    console.log(`🧊 Added ${quantity} stuckPending to event ${eventId}`);
-    return NextResponse.json({ message: "stuckPending updated" });
-  } catch (error) {
-    console.error("❌ Error in stuck-payment route:", error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    await db.collection("stuckPayments").add({
+      eventId,
+      quantity,
+      timestamp: Timestamp.now(),
+      source: "onClose",
+    });
+
+    return NextResponse.json({ message: "🧼 Hold released & logged stuck payment" });
+  } catch (err) {
+    console.error("🚨 Error in /api/stuck-payment", err);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
