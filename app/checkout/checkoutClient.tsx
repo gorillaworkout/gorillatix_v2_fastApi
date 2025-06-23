@@ -160,115 +160,135 @@ export default function CheckoutClient({
   const serviceCharge = 5000;
   const total = subtotal + fees + serviceCharge;
 
- async function onSubmit(values: z.infer<typeof formSchema>) {
-  if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
-  if (!event || !user) return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (disabledTimeLeft > 0) return; // prevent click saat countdown berjalan
+    if (!event || !user) return;
 
-  setIsLoading(true);
-  setError(null);
+    setIsLoading(true);
+    setError(null);
 
-  try {
-    await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
+    try {
+      await reserveTickets(event.id, parseInt(values.quantity)); // Hold ticket
 
-    const timestampSuffix = Date.now().toString().slice(-3); // last 3 digits of timestamp
-    const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random number (100–999)
-    const orderId = `ORDER-${values.firstName}-${timestampSuffix}${randomSuffix}`;
-    console.log(orderId, 'order Id')
-    const transactionPayload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phone: values.phone,
-      quantity: parseInt(values.quantity),
-      price: event.price,
-      eventName: event.title,
-      orderId: orderId,
-    };
-    await createPendingTicket({
-      eventId: event.id,
-      eventName: event.title,
-      quantity: parseInt(values.quantity),
-      price: total,
-      userId: user.uid,
-      customerName: `${values.firstName} ${values.lastName}`,
-      venue: event.venue,
-      orderId,
-      status: "pending",
-    });
-    const response = await fetch("/api/transaction", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(transactionPayload),
-    });
-
-    if (!response.ok) throw new Error("Failed to create transaction");
-    const data: { token: string } = await response.json();
-
-    setIsLoadingPayment(true);
-
-    const snap = (window as any).snap;
-
-    await new Promise<void>((resolve) => {
-      snap?.pay(data.token, {
-        onSuccess: async () => {
-          await confirmPendingTicket(orderId);
-          toast({ title: "Payment successful" });
-          router.push(`/payment-success?orderId=${orderId}`);
-          resolve();
-        },
-        onPending: () => {
-          toast({
-            title: "Payment pending",
-            description: "Check your bank app.",
-          });
-          resolve();
-          router.push("/");
-        },
-        onError: () => {
-          toast({ variant: "destructive", title: "Payment failed" });
-          router.push("/");
-          resolve();
-        },
-        onClose: () => {
-          toast({ title: "Payment cancelled" });
-          router.push("/");
-          resolve();
-        },
+      const timestampSuffix = Date.now().toString().slice(-3); // last 3 digits of timestamp
+      const randomSuffix = Math.floor(100 + Math.random() * 900); // 3-digit random number (100–999)
+      const orderId = `ORDER-${values.firstName}-${timestampSuffix}${randomSuffix}`;
+      console.log(orderId, 'order Id')
+      const transactionPayload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        quantity: parseInt(values.quantity),
+        price: event.price,
+        eventName: event.title,
+        orderId: orderId,
+      };
+      await createPendingTicket({
+        eventId: event.id,
+        eventName: event.title,
+        quantity: parseInt(values.quantity),
+        price: total,
+        userId: user.uid,
+        customerName: `${values.firstName} ${values.lastName}`,
+        venue: event.venue,
+        orderId,
+        status: "pending",
       });
-    });
-  } catch (err) {
-    if (err instanceof Error) {
-      if (err.message.includes("Tickets are sold out")) {
+      const response = await fetch("/api/transaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(transactionPayload),
+      });
+
+      if (!response.ok) throw new Error("Failed to create transaction");
+      const data: { token: string } = await response.json();
+
+      setIsLoadingPayment(true);
+
+      const snap = (window as any).snap;
+
+      await new Promise<void>((resolve) => {
+        snap?.pay(data.token, {
+          onSuccess: async () => {
+            await confirmPendingTicket(orderId);
+            toast({ title: "Payment successful" });
+            router.push(`/payment-success?orderId=${orderId}`);
+            resolve();
+          },
+          onPending: () => {
+            toast({
+              title: "Payment pending",
+              description: "Check your bank app.",
+            });
+            resolve();
+            router.push("/");
+          },
+          onError: () => {
+            toast({ variant: "destructive", title: "Payment failed" });
+            router.push("/");
+            resolve();
+          },
+          onClose: async () => {
+            try {
+              const res = await fetch("/api/stuck-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  eventId: event.id,
+                  quantity: parseInt(values.quantity),
+                }),
+              });
+
+              const data = await res.json();
+              console.log("📦 stuckPending response:", data);
+
+              if (!res.ok) {
+                console.warn("❌ stuckPending update failed:", data.message);
+              }
+            } catch (err) {
+              console.error("🚨 Error calling /api/stuck-payment", err);
+            }
+
+            toast({ title: "Payment cancelled" });
+            router.push("/");
+            resolve();
+          }
+        });
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.includes("Tickets are sold out")) {
+          toast({
+            variant: "destructive",
+            title: "Tickets Unavailable",
+            description:
+              "The tickets have been sold out or held by other users. Please try another event.",
+          });
+          router.push("/");
+          return;
+        }
+
         toast({
           variant: "destructive",
-          title: "Tickets Unavailable",
+          title: "Ticket Reservation Failed",
           description:
-            "The tickets have been sold out or held by other users. Please try another event.",
+            err.message || "An error occurred while reserving your tickets.",
         });
-        router.push("/");
-        return;
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Ticket Reservation Failed",
+          description: "An unknown error occurred while reserving your tickets.",
+        });
       }
-
-      toast({
-        variant: "destructive",
-        title: "Ticket Reservation Failed",
-        description:
-          err.message || "An error occurred while reserving your tickets.",
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Ticket Reservation Failed",
-        description: "An unknown error occurred while reserving your tickets.",
-      });
+      return;
+    } finally {
+      setIsLoading(false);
+      setIsLoadingPayment(false);
+      setDisabledTimeLeft(COUNTDOWN_SECONDS);
     }
-    return;
-  } finally {
-    setIsLoading(false);
-    setIsLoadingPayment(false);
-    setDisabledTimeLeft(COUNTDOWN_SECONDS);
   }
-}
 
 
   const COUNTDOWN_SECONDS = 180; // 3 menit
@@ -448,8 +468,8 @@ export default function CheckoutClient({
                 {disabledTimeLeft > 0
                   ? `Please wait ${formatTime(disabledTimeLeft)}`
                   : quantity <= 0
-                  ? "Out of stock"
-                  : `Pay Now ${quantity}`}
+                    ? "Out of stock"
+                    : `Pay Now ${quantity}`}
               </Button>
             </form>
           </Form>
