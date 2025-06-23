@@ -16,21 +16,11 @@ const db = getFirestore();
 
 export async function POST(req: NextRequest) {
   try {
-    const text = await req.text();
-    console.log("Raw body text:", text);
-
-    let body;
-    try {
-      body = JSON.parse(text);
-    } catch (err) {
-      console.error("🚨 JSON parse error:", err);
-      return NextResponse.json({ message: "Invalid JSON format" }, { status: 400 });
-    }
-
+    const body = await req.json();
     const { eventId, quantity = 1 } = body;
 
-    if (!eventId || !quantity) {
-      return NextResponse.json({ message: "Missing data" }, { status: 400 });
+    if (!eventId || quantity <= 0) {
+      return NextResponse.json({ message: "Missing or invalid data" }, { status: 400 });
     }
 
     const eventRef = db.collection("events").doc(eventId);
@@ -40,10 +30,14 @@ export async function POST(req: NextRequest) {
       if (!docSnap.exists) throw new Error("Event not found");
 
       const currentHold = docSnap.data()?.holdTickets || 0;
+      const currentStuck = docSnap.data()?.stuckPending || 0;
+
       const newHold = Math.max(0, currentHold - quantity);
+      const newStuck = currentStuck + quantity;
 
       tx.update(eventRef, {
         holdTickets: newHold,
+        stuckPending: newStuck,
         updatedAt: Timestamp.now(),
       });
     });
@@ -55,7 +49,7 @@ export async function POST(req: NextRequest) {
       source: "onClose",
     });
 
-    return NextResponse.json({ message: "🧼 Hold released & logged stuck payment" });
+    return NextResponse.json({ message: "🧼 Hold released & stuckPending updated & logged stuck payment" });
   } catch (err) {
     console.error("🚨 Error in /api/stuck-payment", err);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
