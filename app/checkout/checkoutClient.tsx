@@ -420,7 +420,7 @@ export default function CheckoutClient({
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Ticket Information</h2>
                 <p className="text-sm text-muted-foreground">
-                  Anak di bawah 3 tahun{" "}
+                  Anak di bawah 4 tahun{" "}
                   <span className="font-semibold">gratis</span> tanpa tiket.
                 </p>
                 <FormField
