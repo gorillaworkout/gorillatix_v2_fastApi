@@ -83,7 +83,7 @@ const HiddenTicketDownload: React.FC<HiddenTicketDownloadProps> = ({
           </div>
           <div className="flex justify-between mt-1">
             <span className="font-medium">Quantity</span>
-            <span>5</span>
+            <span>{ticket.quantity}</span>
           </div>
           <div className="flex justify-between mt-1">
             <span className="font-medium">Total</span>
