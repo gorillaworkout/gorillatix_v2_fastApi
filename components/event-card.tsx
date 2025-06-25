@@ -188,6 +188,7 @@ export function EventCard({ event }: EventCardProps) {
             filter: isDisabled ? "grayscale(50%) brightness(0.9)" : "none",
             transition: "filter 0.3s ease",
           }}
+          unoptimized
         />
         {isDisabled && (
           <div className="absolute inset-0 bg-black bg-opacity-10 pointer-events-none" />

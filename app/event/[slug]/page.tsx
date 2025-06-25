@@ -219,6 +219,7 @@ const handleBuyTickets = async () => {
                     }`}
                   onLoad={() => setImageLoaded(true)}
                   priority
+                  unoptimized
                 />
               </div>
               {/* <div className="relative w-full aspect-video">
