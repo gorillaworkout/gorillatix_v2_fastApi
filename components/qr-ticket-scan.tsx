@@ -54,6 +54,9 @@ export default function TicketScanner() {
           `⚠️ Ticket is no longer valid for use.\n` +
           `• Status: ${snap.data().status}\n` +
           `• Customer: ${snap.data().customerName}\n\n` +
+          `• Quantity: ${snap.data().quantity} \n`+
+          `• Price: ${snap.data().totalPrice} \n` + 
+          `• Order ID : ${snap.data().orderId} \n\n` + 
           `This ticket has already been exchanged and cannot be reused.`
         );
         setTicketData(data)
@@ -141,9 +144,11 @@ export default function TicketScanner() {
             <div className="text-sm text-muted-foreground space-y-1">
               <p><strong>Event Title:</strong> {ticketData?.eventName}</p>
               <p><strong>Customer Name:</strong> {ticketData?.customerName}</p>
+              <p><strong>Quantity:</strong> {ticketData?.quantity}</p>
+              <p><strong>Order ID:</strong> {ticketData?.orderId}</p>
               <div>
                 <strong>Status:</strong>{" "}
-                <Badge variant={ticketData?.status === "confirmed" ? "default" : "destructive"}>
+                <Badge variant={ticketData?.status === "confirmed"  || ticketData?.status === "paid" ? "default" : "destructive"}>
                   {ticketData?.status}
                 </Badge>
               </div>
