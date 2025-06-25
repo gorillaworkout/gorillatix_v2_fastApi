@@ -205,7 +205,7 @@ export default function OrdersPage() {
                 {upcomingTickets.map((ticket) => {
                   const event = ticketEvents[ticket.eventId];
                   if (!event) return null;
-                  if(ticket.status === "paid" || ticket.status === "confirmed"){
+                  if(ticket.status === "paid" || ticket.status === "confirmed" || ticket.status === "exchanged"){
                     return (
                       <Card key={ticket.id}>
                         <CardHeader className="pb-3">
@@ -294,70 +294,72 @@ export default function OrdersPage() {
                 {pastTickets.map((ticket) => {
                   const eventItem = ticketEvents[ticket.eventId];
                   if (!eventItem) return null;
-
-                  return (
-                    <Card key={ticket.id}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle>{eventItem.title}</CardTitle>
-                            <CardDescription className="mt-2">
-                              <div className="flex items-center">
-                                <Calendar className="mr-1 h-4 w-4" />
-                                {eventItem.date} at {eventItem.time}
-                              </div>
-                              <div className="mt-2 flex flex-row">
-                                {" "}
-                                <MapPin className="mr-1 h-4 w-4 text-white" />
-                                {eventItem.venue}
-                              </div>
-                            </CardDescription>
-                          </div>
-                          <Badge variant="outline">{ticket.status}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div>
-                            <div className="text-sm font-medium">
-                              Order Details
+                   if(ticket.status === "paid" || ticket.status === "confirmed" || ticket.status === "exchanged"){
+                    return (
+                      <Card key={ticket.id}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle>{eventItem.title}</CardTitle>
+                              <CardDescription className="mt-2">
+                                <div className="flex items-center">
+                                  <Calendar className="mr-1 h-4 w-4" />
+                                  {eventItem.date} at {eventItem.time}
+                                </div>
+                                <div className="mt-2 flex flex-row">
+                                  {" "}
+                                  <MapPin className="mr-1 h-4 w-4 text-white" />
+                                  {eventItem.venue}
+                                </div>
+                              </CardDescription>
                             </div>
-                            <div className="mt-1 text-sm text-muted-foreground">
-                              <div>Order #: {ticket.id}</div>
-                              <div>
-                                {ticket.quantity}{" "}
-                                {ticket.quantity === 1 ? "ticket" : "tickets"}
+                            <Badge variant="outline">{ticket.status}</Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div>
+                              <div className="text-sm font-medium">
+                                Order Details
                               </div>
-                              <div>
-                                Total: {formatRupiah(ticket.totalPrice)}
+                              <div className="mt-1 text-sm text-muted-foreground">
+                                <div>Order #: {ticket.id}</div>
+                                <div>
+                                  {ticket.quantity}{" "}
+                                  {ticket.quantity === 1 ? "ticket" : "tickets"}
+                                </div>
+                                <div>
+                                  Total: {formatRupiah(ticket.totalPrice)}
+                                </div>
                               </div>
                             </div>
+                            <div className="flex items-center justify-end gap-2">
+                               {(ticket.status === "confirmed" || ticket.status === "paid") && (
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleDownloadTicket(ticket)}
+                                  >
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Download
+                                  </Button>
+                                  <Button size="sm" onClick={() => handleViewTicket(ticket)}>
+                                    <Ticket className="mr-2 h-4 w-4" />
+                                    View Tickets
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDownloadTicket(ticket)}
-                            >
-                              <Download className="mr-2 h-4 w-4" />
-                              Download
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => handleViewTicket(ticket)}
-                            >
-                              <Ticket className="mr-2 h-4 w-4" />
-                              View Tickets
-                            </Button>
-                          </div>
-                        </div>
-                        <HiddenTicketDownload
-                          ticket={ticket}
-                          event={eventItem}
-                        />
-                      </CardContent>
-                    </Card>
-                  );
+                          <HiddenTicketDownload
+                            ticket={ticket}
+                            event={eventItem}
+                          />
+                        </CardContent>
+                      </Card>
+                    );
+                   }
                 })}
               </div>
             ) : (
