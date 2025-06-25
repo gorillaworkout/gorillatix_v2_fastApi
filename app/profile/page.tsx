@@ -23,6 +23,7 @@ import { getEventById, getUserTickets } from "@/lib/firebase-service";
 import { formatRupiah } from "@/lib/utils";
 import html2canvas from "html2canvas";
 import HiddenTicketDownload from "@/components/hidden-ticket-download";
+import { Badge } from "@/components/ui/badge";
 
 // Mock data for tickets
 // const mockTickets = [
@@ -332,7 +333,7 @@ export default function ProfilePage() {
                                     {formatRupiah(ticket.totalPrice)}
                                   </div>
                                    <div className="text-sm text-muted-foreground mt-1">
-                                    •{ticket.status}
+                                    <Badge>{ticket.status}</Badge>
                                   </div>
                                 </div>
                                 <div className="flex gap-2">
@@ -400,7 +401,7 @@ export default function ProfilePage() {
                                     • ${ticket.totalPrice.toFixed(2)}
                                   </div>
                                    <div className="text-sm text-muted-foreground mt-1">
-                                    {ticket.status}
+                                      <Badge>{ticket.status}</Badge>
                                   </div>
                                 </div>
                                 <div className="flex gap-2">
