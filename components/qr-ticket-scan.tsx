@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { doc, getDoc, updateDoc } from "firebase/firestore"
+import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import {
   AlertDialog,
@@ -57,6 +57,7 @@ export default function TicketScanner() {
           `• Quantity: ${snap.data().quantity} \n`+
           `• Price: ${snap.data().totalPrice} \n` + 
           `• Order ID : ${snap.data().orderId} \n\n` + 
+          `• Exchange Time : ${snap.data().updatedAt} \n\n` + 
           `This ticket has already been exchanged and cannot be reused.`
         );
         setTicketData(data)
@@ -160,7 +161,7 @@ export default function TicketScanner() {
               onClick={async () => {
                 if (!ticketId) return
                 const ticketRef = doc(db, "tickets", ticketId)
-                await updateDoc(ticketRef, { status: "exchanged" })
+                await updateDoc(ticketRef, { status: "exchanged",updatedAt: serverTimestamp(), })
                 setDialogOpen(false)
                 alert("✅ Ticket marked as exchanged.")
               }}
