@@ -154,6 +154,7 @@ export default function TicketsPage() {
             <SelectItem value="paid_confirmed">Paid / Confirmed</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="exchanged">Exchanged</SelectItem>
           </SelectContent>
         </Select>
       </div>
