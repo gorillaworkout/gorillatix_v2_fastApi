@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
 
       const tickets = querySnapshot.docs
         .map((doc) => doc.data())
-        .filter((data) => ["paid", "confirmed"].includes(data.status)) // 🎯 hanya paid & confirmed
+        .filter((data) => ["paid", "confirmed","exchanged"].includes(data.status)) // 🎯 hanya paid & confirmed
         .map((data) => ({
           "Customer Name": data.customerName || "-",
           "User ID": data.userId || "-",
