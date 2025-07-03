@@ -4,30 +4,32 @@ import { StatusTicketProps } from "./tickets";
 // Event types
 export interface EventItem {
   id: string;
-  slug: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  venue: string;
   address: string;
   category: string;
+  createdAt: any; // Firestore timestamp, use proper type if using Firebase SDK types
+  date: string;
   description: string;
+  endSellingDate: string;
+  holdTickets?: number;
   imageUrl: string;
-  price: number;
-  ticketsAvailable: number;
+  latitude: string;
+  location: string;
+  longitude: string;
   organizer: string;
   organizerDescription: string;
-  createdAt: any; // Firestore timestamp, use proper type if using Firebase SDK types
+  price: number;
+  slug: string;
+  startSellingDate: string;
+  status: "Active" | "upcoming" | "completed";
+  stuckPending?: number;
+  ticketsAvailable: number;
+  ticketsSold: number;
+  time: string;
+  timeSelling: string;
+  title: string;
   updatedAt: any; // same here
   userId?: string;
-  status: "Active" | "upcoming" | "completed";
-  ticketsSold: number;
-  startSellingDate: string;
-  endSellingDate: string;
-  latitude: string;
-  longitude: string;
-  timeSelling: string;
+  venue: string;
 }
 
 export interface EventInput {

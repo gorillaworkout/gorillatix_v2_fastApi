@@ -65,47 +65,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Listen for auth state changes
-    const unsubscribe = onAuthChange(async (authUser) => {
-      try {
-        if (authUser) {
-          // Create user profile if it doesn't exist
-          await createUserProfile(authUser)
-
-          // Get user role from Firestore
-          const { db } = await import("@/lib/firebase")
-          const { doc, getDoc } = await import("firebase/firestore")
-
-          const userRef = doc(db, "users", authUser.uid)
-          const userSnap = await getDoc(userRef)
-
-          const extendedUser = authUser as ExtendedUser
-
-          if (userSnap.exists()) {
-            const userData = userSnap.data()
-            extendedUser.role = userData.role || "user"
-          } else {
-            extendedUser.role = "user"
-          }
-
-          setUser(extendedUser)
-        } else {
-          setUser(null)
+  const unsubscribe = onAuthChange(async (authUser) => {
+    try {
+      if (authUser) {
+        if (!authUser.email) {
+          throw new Error("User email is null");
         }
-      } catch (err) {
-        console.error("Auth state change error:", err)
-        setError("Authentication error")
-      } finally {
-        setLoading(false)
-        setAuthInitialized(true)
-      }
-    })
+        await createUserProfile(authUser);
 
-    // Cleanup subscription
-    return () => {
-      unsubscribe()
+        const { db } = await import("@/lib/firebase");
+        const { doc, getDoc } = await import("firebase/firestore");
+
+        const userRef = doc(db, "users", authUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        const extendedUser = authUser as ExtendedUser;
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          extendedUser.role = userData.role || "user";
+        } else {
+          extendedUser.role = "user";
+        }
+
+        setUser(extendedUser);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Auth state change error:", err);
+      setError("Authentication error");
+    } finally {
+      setLoading(false);
+      setAuthInitialized(true);
     }
-  }, [])
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   // Check for auth state on focus/visibility change
   useEffect(() => {

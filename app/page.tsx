@@ -11,6 +11,9 @@ import { SkeletonCard } from "@/components/skeleton-card";
 export default function Home() {
   // Get events from context
   const { events, loading } = useEvents();
+  console.log(events, 'events app/page 14')
+
+
   const sortedEvents = events
     ? (() => {
         const now = new Date();
@@ -52,7 +55,7 @@ export default function Home() {
         return [...activeEvents, ...upcomingEvents, ...pastEvents];
       })()
     : [];
-
+  console.log(sortedEvents, 'sortedEvents');
   return (
     <div className="container mx-auto px-4 py-8">
       <HeroSection />

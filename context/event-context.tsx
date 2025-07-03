@@ -2,21 +2,17 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import {
-  getEvents as getFirestoreEvents,
   updateEvent as updateFirestoreEvent,
   deleteEvent as deleteFirestoreEvent,
   getEventById as getFirestoreEventById,
   getEventBySlug as getFirestoreEventBySlug,
 } from "@/lib/firebase-service"
-// import { useAuth } from "@/components/auth-provider"
 import { EventItem } from "@/types/event"
 
-// Create the context
 interface EventContextType {
   events: EventItem[]
   loading: boolean
   error: string | null
-  // addEvent: (event: Omit<EventItem, "id" | "slug">) => Promise<EventItem | null>
   updateEvent: (id: string, event: Partial<EventItem>) => Promise<EventItem | null>
   deleteEvent: (id: string) => Promise<boolean>
   getEventById: (id: string) => Promise<EventItem | null>
@@ -26,14 +22,14 @@ interface EventContextType {
 
 const EventContext = createContext<EventContextType | undefined>(undefined)
 
-// Create a provider component
 export function EventProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<EventItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-  // const { user } = useAuth()
 
-  // Create a slug from the title
+  const STORAGE_KEY = "cachedEvents"
+
+  // Function to create slug from title
   const createSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -41,59 +37,81 @@ export function EventProvider({ children }: { children: ReactNode }) {
       .replace(/ +/g, "-")
   }
 
-  // Load events from Firestore on mount
+  // Fetch events from API
   const fetchEvents = async () => {
     setLoading(true)
     try {
-      const fetchedEvents = await getFirestoreEvents()
+      const response = await fetch("https://fastapi-gorillatix-production.up.railway.app/events/")
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
-      if (fetchedEvents && fetchedEvents.length > 0) {
-        // Ensure all events have slugs
-        const eventsWithSlugs = fetchedEvents.map((event) => ({
+      const data = await response.json()
+
+      if (Array.isArray(data)) {
+        const eventsWithSlugs = data.map((event) => ({
           ...event,
-          slug: event.slug || createSlug(event.title),
+          slug: event.slug?.trim() ? event.slug : createSlug(event.title),
         }))
         setEvents(eventsWithSlugs)
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(eventsWithSlugs))
       } else {
-        // Empty array if no events found
         setEvents([])
+        sessionStorage.removeItem(STORAGE_KEY)
+        console.warn("[⚠️] Unexpected data format received:", data)
       }
+
       setError(null)
-    } catch (err) {
-      console.error("Error fetching events:", err)
-      setError("Failed to load events")
+    } catch (err: any) {
+      console.error("❌ Error fetching events:", err?.message || err)
       setEvents([])
+      sessionStorage.removeItem(STORAGE_KEY)
+      setError("Failed to load events")
     } finally {
       setLoading(false)
     }
   }
 
-  // Initial fetch
+  // On mount, load cached events if available, else fetch
   useEffect(() => {
+    const cached = sessionStorage.getItem(STORAGE_KEY)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        if (Array.isArray(parsed)) {
+          setEvents(parsed)
+          setLoading(false)
+          setError(null)
+          return // pakai cache, tidak fetch ulang
+        }
+      } catch {
+        // parsing error, lanjut fetch baru
+      }
+    }
+
+    // Tidak ada cache valid, fetch events
     fetchEvents()
   }, [])
 
-  // Refresh events
+  // Refresh events (force fetch)
   const refreshEvents = async () => {
     await fetchEvents()
   }
 
-  // Update an existing event
+  // Update event
   const updateEvent = async (id: string, updatedEvent: Partial<EventItem>) => {
     try {
-      // If title is being updated, also update the slug
       const updateData: Partial<EventItem> = { ...updatedEvent }
       if (updatedEvent.title) {
         updateData.slug = createSlug(updatedEvent.title)
       }
 
-      // Update in Firestore
       await updateFirestoreEvent(id, updateData)
 
-      // Update local state
-      setEvents((prev) => prev.map((event) => (event.id === id ? { ...event, ...updateData } : event)))
+      setEvents((prev) =>
+        prev.map((event) => (event.id === id ? { ...event, ...updateData } : event))
+      )
 
-      // Get the updated event
       const updated = events.find((e) => e.id === id)
       return updated || null
     } catch (err) {
@@ -103,13 +121,10 @@ export function EventProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Delete an event
+  // Delete event
   const deleteEvent = async (id: string) => {
     try {
-      // Delete from Firestore
       await deleteFirestoreEvent(id)
-
-      // Remove from local state
       setEvents((prev) => prev.filter((event) => event.id !== id))
       return true
     } catch (err) {
@@ -119,14 +134,12 @@ export function EventProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Get an event by ID
+  // Get event by ID
   const getEventById = async (id: string) => {
     try {
-      // First check local state
       const localEvent = events.find((event) => event.id === id)
       if (localEvent) return localEvent
 
-      // If not found locally, fetch from Firestore
       const event = await getFirestoreEventById(id)
       return event as EventItem | null
     } catch (err) {
@@ -136,18 +149,15 @@ export function EventProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Get an event by slug
+  // Get event by slug
   const getEventBySlug = async (slug: string) => {
     try {
-      // Check local state first
       const localEvent = events.find((event) => event.slug === slug)
       if (localEvent) return localEvent
 
-      // If not found locally, fetch from Firestore
       const event = await getFirestoreEventBySlug(slug)
       if (event) return event as EventItem
 
-      // If still not found, refresh events and try again
       await refreshEvents()
       return events.find((event) => event.slug === slug) || null
     } catch (err) {
@@ -162,7 +172,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
         events,
         loading,
         error,
-        // addEvent,
         updateEvent,
         deleteEvent,
         getEventById,
@@ -175,7 +184,6 @@ export function EventProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Create a custom hook to use the context
 export function useEvents() {
   const context = useContext(EventContext)
   if (context === undefined) {

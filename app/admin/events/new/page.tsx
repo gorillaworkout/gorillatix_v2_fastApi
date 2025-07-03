@@ -92,65 +92,133 @@ export default function NewEventPage() {
     },
   });
 
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   setIsLoading(true);
+
+  //   try {
+  //     // ✅ Upload image ke Firebase Storage
+  //     const imageFile = values.image as File;
+
+  //     const storageRef = ref(
+  //       storage,
+  //       `event-images/${Date.now()}-${imageFile.name}`
+  //     );
+  //     const snapshot = await uploadBytes(storageRef, imageFile);
+  //     const downloadURL = await getDownloadURL(snapshot.ref);
+
+  //     const location = `${values.address}, ${values.city}`;
+  //     const newEvent = await createEvent({
+  //       title: values.title,
+  //       description: values.description,
+  //       category: values.category,
+  //       date: values.date.toISOString().split("T")[0],
+  //       time: values.time,
+  //       venue: values.venue,
+  //       address: values.address,
+  //       location: location,
+  //       imageUrl: downloadURL,
+  //       price: Number.parseFloat(values.price),
+  //       ticketsAvailable: Number.parseInt(values.totalTickets),
+  //       ticketsSold: 0,
+  //       organizer: "ICA",
+  //       organizerDescription: values.description,
+  //       status: "Active",
+  //       slug: "",
+  //       userId: "",
+  //       startSellingDate: values.startSellingDate.toISOString().split("T")[0],
+  //       endSellingDate: values.startSellingDate.toISOString().split("T")[0],
+  //       latitude:"",
+  //       longitude:"",
+  //       timeSelling: values.timeSelling
+  //     });
+  //     if (newEvent) {
+  //       toast({
+  //         title: "Event created",
+  //         description: "Your event has been created successfully.",
+  //       });
+  //       window.location.href = "/admin/dashboard";
+  //     } else {
+  //       throw new Error("Failed to create event");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating event:", error);
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Something went wrong",
+  //       description: "Failed to create event. Please try again.",
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      // ✅ Upload image ke Firebase Storage
-      const imageFile = values.image as File;
+  try {
+    const imageFile = values.image as File;
+    const storageRef = ref(
+      storage,
+      `event-images/${Date.now()}-${imageFile.name}`
+    );
+    const snapshot = await uploadBytes(storageRef, imageFile);
+    const downloadURL = await getDownloadURL(snapshot.ref);
 
-      const storageRef = ref(
-        storage,
-        `event-images/${Date.now()}-${imageFile.name}`
-      );
-      const snapshot = await uploadBytes(storageRef, imageFile);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+    const eventPayload = {
+      title: values.title,
+      description: values.description,
+      category: values.category,
+      date: values.date.toISOString().split("T")[0],
+      time: values.time,
+      venue: values.venue,
+      address: values.address,
+      imageUrl: downloadURL,
+      price: parseFloat(values.price),
+      ticketsAvailable: parseInt(values.totalTickets, 10),
+      ticketsSold: 0,
+      organizer: "ICA",
+      organizerDescription: values.description,
+      status: "Active",
+      slug: values.title.toLowerCase().replace(/\s+/g, "-"),
+      userId: "", // Ganti jika punya UID
+      startSellingDate: values.startSellingDate.toISOString().split("T")[0],
+      endSellingDate: values.endSellingDate.toISOString().split("T")[0],
+      latitude: "",
+      longitude: "",
+      timeSelling: values.timeSelling,
+    };
+    console.log(eventPayload, 'event payload')
 
-      const location = `${values.address}, ${values.city}`;
-      const newEvent = await createEvent({
-        title: values.title,
-        description: values.description,
-        category: values.category,
-        date: values.date.toISOString().split("T")[0],
-        time: values.time,
-        venue: values.venue,
-        address: values.address,
-        location: location,
-        imageUrl: downloadURL,
-        price: Number.parseFloat(values.price),
-        ticketsAvailable: Number.parseInt(values.totalTickets),
-        ticketsSold: 0,
-        organizer: "ICA",
-        organizerDescription: values.description,
-        status: "Active",
-        slug: "",
-        userId: "",
-        startSellingDate: values.startSellingDate.toISOString().split("T")[0],
-        endSellingDate: values.startSellingDate.toISOString().split("T")[0],
-        latitude:"",
-        longitude:"",
-        timeSelling: values.timeSelling
-      });
-      if (newEvent) {
-        toast({
-          title: "Event created",
-          description: "Your event has been created successfully.",
-        });
-        window.location.href = "/admin/dashboard";
-      } else {
-        throw new Error("Failed to create event");
-      }
-    } catch (error) {
-      console.error("Error creating event:", error);
-      toast({
-        variant: "destructive",
-        title: "Something went wrong",
-        description: "Failed to create event. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
+    const res = await fetch("https://fastapi-gorillatix-production.up.railway.app/events/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventPayload),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to create event. Status: ${res.status}`);
     }
+
+    toast({
+      title: "Event created",
+      description: "Your event has been created successfully.",
+    });
+
+    window.location.href = "/admin/dashboard";
+  } catch (error) {
+    console.error("Error creating event:", error);
+    toast({
+      variant: "destructive",
+      title: "Something went wrong",
+      description: "Failed to create event. Please try again.",
+    });
+  } finally {
+    setIsLoading(false);
   }
+}
+
+
 
   return (
     <div className="container mx-auto py-8">
