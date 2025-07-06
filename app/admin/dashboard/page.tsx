@@ -37,6 +37,7 @@ import TicketsPage from "@/components/admin/tickets-list";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { exportToExcelWithTitle } from "@/scripts/excel";
+import UsersPage from "@/components/admin/users-list";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -175,7 +176,7 @@ export default function AdminDashboardPage() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="tickets">Tickets</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -318,17 +319,14 @@ export default function AdminDashboardPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="reports" className="space-y-4">
+        <TabsContent value="users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Reports</CardTitle>
-              <CardDescription>Generate and download reports</CardDescription>
+              <CardTitle>Users</CardTitle>
+              <CardDescription>All Users Account</CardDescription>
             </CardHeader>
-            <CardContent className="h-[400px] flex items-center justify-center">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <CreditCard className="h-10 w-10" />
-                <p>Report generation tools will be displayed here</p>
-              </div>
+            <CardContent>
+              <UsersPage />
             </CardContent>
           </Card>
         </TabsContent>
